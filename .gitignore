@@ -1,0 +1,4 @@
+.ccls
+build/
+lib/
+bin/
