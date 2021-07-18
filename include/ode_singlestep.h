@@ -42,6 +42,30 @@ typedef struct{
 /** \brief Struct address working arrays for real integration routines */
 typedef _RealWorkspaceRK * RealWorkspaceRK;
 
+/** \brief Alloc struct internal arrays */
+void
+cmplx_rkwsarrays_alloc(ComplexWorkspaceRK);
+
+/** \brief Alloc struct internal arrays */
+void
+real_rkwsarrays_alloc(RealWorkspaceRK);
+
+/** \brief Free internal struct pointers */
+void
+cmplx_rkwsarrays_free(ComplexWorkspaceRK ws);
+
+/** \brief Free internal struct pointers */
+void
+real_rkwsarrays_free(RealWorkspaceRK ws);
+
+/** \brief Return fresh allocated struct ready to use */
+ComplexWorkspaceRK
+get_cmplx_rkws(int);
+
+/** \brief Return fresh allocated struct ready to use */
+RealWorkspaceRK
+get_real_rkws(int);
+
 /**
  * \brief 4th order Runge-Kutta method step integration
  *

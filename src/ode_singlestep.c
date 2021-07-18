@@ -16,6 +16,71 @@
  */
 
 #include "ode_singlestep.h"
+#include <stdlib.h>
+
+
+void
+cmplx_rkwsarrays_alloc(ComplexWorkspaceRK ws)
+{
+    ws->work1 = (Carray) malloc(ws->system_size * sizeof(double complex));
+    ws->work2 = (Carray) malloc(ws->system_size * sizeof(double complex));
+    ws->work3 = (Carray) malloc(ws->system_size * sizeof(double complex));
+    ws->work4 = (Carray) malloc(ws->system_size * sizeof(double complex));
+    ws->work5 = (Carray) malloc(ws->system_size * sizeof(double complex));
+}
+
+
+void
+real_rkwsarrays_alloc(RealWorkspaceRK ws)
+{
+    ws->work1 = (Rarray) malloc(ws->system_size * sizeof(double));
+    ws->work2 = (Rarray) malloc(ws->system_size * sizeof(double));
+    ws->work3 = (Rarray) malloc(ws->system_size * sizeof(double));
+    ws->work4 = (Rarray) malloc(ws->system_size * sizeof(double));
+    ws->work5 = (Rarray) malloc(ws->system_size * sizeof(double));
+}
+
+
+void
+cmplx_rkwsarrays_free(ComplexWorkspaceRK ws)
+{
+    free(ws->work1);
+    free(ws->work2);
+    free(ws->work3);
+    free(ws->work4);
+    free(ws->work5);
+}
+
+
+void
+real_rkwsarrays_free(RealWorkspaceRK ws)
+{
+    free(ws->work1);
+    free(ws->work2);
+    free(ws->work3);
+    free(ws->work4);
+    free(ws->work5);
+}
+
+
+ComplexWorkspaceRK
+get_cmplx_rkws(int sys_size)
+{
+    ComplexWorkspaceRK
+        ws = (ComplexWorkspaceRK) malloc(sizeof(_ComplexWorkspaceRK));
+    ws->system_size = sys_size;
+    return ws;
+}
+
+
+RealWorkspaceRK
+get_real_rkws(int sys_size)
+{
+    RealWorkspaceRK
+        ws = (RealWorkspaceRK) malloc(sizeof(_RealWorkspaceRK));
+    ws->system_size = sys_size;
+    return ws;
+}
 
 
 void
