@@ -4,7 +4,8 @@
  * \date July 2021
  * \brief File containing suitable datatype for n-dimensional vectors
  *
- * A n-dimensional vector is implemented as array of values using pointers
+ * A n-dimensional vector can be implemented as array of values
+ * using pointers or struct, to also parse the vector dimension
  */
 
 #ifndef VECTOR_H
@@ -17,5 +18,21 @@ typedef double * Rarray;
 
 /** \brief Array of complex numbers as double complex pointers */
 typedef double complex * Carray;
+
+/** \brief Struct for real vector definition with a given dimension */
+typedef struct{
+    unsigned int
+        dim;    /// space dimension, also number of components
+    Rarray
+        vals;   /// array with values. Size of `dim`
+} RealVector;
+
+/** \brief Struct for complex vector definition with a given dimension */
+typedef struct{
+    unsigned int
+        dim;    /// space dimension, also number of components
+    Carray
+        vals;   /// array with values. Size of `dim`
+} ComplexVector;
 
 #endif

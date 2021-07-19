@@ -14,16 +14,15 @@ set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(odelib SHARED src/ode_multistep.c src/ode_singlestep.c)
 target_include_directories(odelib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-# target_link_libraries(linalglib m)
 
 
-add_executable(test apps/test.c)
-target_link_libraries(test PUBLIC odelib)
-set_target_properties(test PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+add_executable(quinney_examples apps/quinney_examples.c)
+target_link_libraries(quinney_examples PUBLIC odelib)
+set_target_properties(quinney_examples PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
 
 
 install(TARGETS odelib DESTINATION lib)
-install(TARGETS test DESTINATION bin)
+install(TARGETS quinney_examples DESTINATION bin)
 
 
 # To install in non-standard directory a shared lib see the Zaffy answer

@@ -11,9 +11,15 @@
 #ifndef ODE_MULTISTEP_H
 #define ODE_MULTISTEP_H
 
+#include <stdlib.h>
 #include "derivative_signature.h"
 
-/** \brief Struct to provide workspace for multistep methods */
+/** \brief Struct to provide complex workspace for multistep methods
+ *
+ * Provide basic data to simplify the general multistep methods API,
+ * with max number of previous steps required, system size and array
+ * with all previous derivatives pre-computed
+ */
 typedef struct{
     int
         ms_order,       /// number of previous steps required
@@ -22,10 +28,15 @@ typedef struct{
         prev_der;       /// Hold all required previous derivatives
 } _ComplexWorkspaceMS;
 
-/** \brief Struct address with working array for multistep methods */
+/** \brief Workspace struct address for multistep methods */
 typedef _ComplexWorkspaceMS * ComplexWorkspaceMS;
 
-/** \brief Struct to provide workspace for multistep methods */
+/** \brief Struct to provide real workspace for multistep methods
+ *
+ * Provide basic data to simplify the general multistep methods API,
+ * with max number of previous steps required, system size and array
+ * with all previous derivatives pre-computed
+ */
 typedef struct{
     int
         ms_order,       /// number of previous steps required
@@ -36,6 +47,50 @@ typedef struct{
 
 /** \brief Struct address with working array for multistep methods */
 typedef _RealWorkspaceMS * RealWorkspaceMS;
+
+
+/** \brief Alloc struct internal array based on its integer fields */
+void
+alloc_cmplx_multistep_array(ComplexWorkspaceMS);
+
+/** \brief Alloc struct internal array based on its integer fields */
+void
+alloc_real_multistep_array(RealWorkspaceMS);
+
+/** \brief Free internal struct pointer */
+void
+free_cmplx_multistep_array(ComplexWorkspaceMS);
+
+/** \brief Free internal struct pointer */
+void
+free_real_multistep_array(RealWorkspaceMS);
+
+/** \brief Return fresh allocated struct address with internal fields set
+ *
+ * \param 1 : system size
+ * \param 2 : multistep order (number of previous steps required)
+ */
+ComplexWorkspaceMS
+get_cmplx_multistep_ws(unsigned int, unsigned int);
+
+/** \brief Return fresh allocated struct address with internal fields set
+ *
+ * \param 1 : system size
+ * \param 2 : multistep order (number of previous steps required)
+ */
+RealWorkspaceMS
+get_real_multistep_ws(unsigned int, unsigned int);
+
+
+/** \brief Free allocated complex workspace struct and its internal pointer */
+void
+free_cmplx_multistep_ws(ComplexWorkspaceMS);
+
+
+/** \brief Free allcated real workspace struct and its internal pointer */
+void
+free_real_multistep_ws(RealWorkspaceMS);
+
 
 
 /**

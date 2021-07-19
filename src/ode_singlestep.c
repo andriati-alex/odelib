@@ -20,7 +20,7 @@
 
 
 void
-cmplx_rkwsarrays_alloc(ComplexWorkspaceRK ws)
+alloc_cmplx_rkwsarrays(ComplexWorkspaceRK ws)
 {
     ws->work1 = (Carray) malloc(ws->system_size * sizeof(double complex));
     ws->work2 = (Carray) malloc(ws->system_size * sizeof(double complex));
@@ -31,7 +31,7 @@ cmplx_rkwsarrays_alloc(ComplexWorkspaceRK ws)
 
 
 void
-real_rkwsarrays_alloc(RealWorkspaceRK ws)
+alloc_real_rkwsarrays(RealWorkspaceRK ws)
 {
     ws->work1 = (Rarray) malloc(ws->system_size * sizeof(double));
     ws->work2 = (Rarray) malloc(ws->system_size * sizeof(double));
@@ -42,7 +42,7 @@ real_rkwsarrays_alloc(RealWorkspaceRK ws)
 
 
 void
-cmplx_rkwsarrays_free(ComplexWorkspaceRK ws)
+free_cmplx_rkwsarrays(ComplexWorkspaceRK ws)
 {
     free(ws->work1);
     free(ws->work2);
@@ -53,7 +53,7 @@ cmplx_rkwsarrays_free(ComplexWorkspaceRK ws)
 
 
 void
-real_rkwsarrays_free(RealWorkspaceRK ws)
+free_real_rkwsarrays(RealWorkspaceRK ws)
 {
     free(ws->work1);
     free(ws->work2);
@@ -69,6 +69,7 @@ get_cmplx_rkws(int sys_size)
     ComplexWorkspaceRK
         ws = (ComplexWorkspaceRK) malloc(sizeof(_ComplexWorkspaceRK));
     ws->system_size = sys_size;
+    alloc_cmplx_rkwsarrays(ws);
     return ws;
 }
 
@@ -79,13 +80,29 @@ get_real_rkws(int sys_size)
     RealWorkspaceRK
         ws = (RealWorkspaceRK) malloc(sizeof(_RealWorkspaceRK));
     ws->system_size = sys_size;
+    alloc_real_rkwsarrays(ws);
     return ws;
 }
 
 
 void
+free_real_rkws(RealWorkspaceRK ws)
+{
+    free_real_rkwsarrays(ws);
+    free(ws);
+}
+
+
+void free_cmplx_rkws(ComplexWorkspaceRK ws)
+{
+    free_cmplx_rkwsarrays(ws);
+    free(ws);
+}
+
+
+void
 cmplx_rungekutta4(
-        double dx,
+        double h,
         double x,
         cmplx_sys_der yprime,
         void * args,
@@ -116,29 +133,29 @@ cmplx_rungekutta4(
     yprime(sys_size, x, y, k1, args);
     for (i = 0; i < sys_size; i++)
     {
-        karg[i] = 0.5 * dx * k1[i] + y[i];
+        karg[i] = 0.5 * h * k1[i] + y[i];
     }
-    yprime(sys_size, x + 0.5 * dx, karg, k2, args);
+    yprime(sys_size, x + 0.5 * h, karg, k2, args);
     for (i = 0; i < sys_size; i++)
     {
-        karg[i] = 0.5 * dx * k2[i] + y[i];
+        karg[i] = 0.5 * h * k2[i] + y[i];
     }
-    yprime(sys_size, x + 0.5 * dx, karg, k3, args);
+    yprime(sys_size, x + 0.5 * h, karg, k3, args);
     for (i = 0; i < sys_size; i++)
     {
-        karg[i] = dx * k3[i] + y[i];
+        karg[i] = h * k3[i] + y[i];
     }
-    yprime(sys_size, x + dx, karg, k4, args);
+    yprime(sys_size, x + h, karg, k4, args);
     for (i = 0; i < sys_size; i++)
     {
-        ynext[i] = y[i] + (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) * dx / 6;
+        ynext[i] = y[i] + (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) * h / 6;
     }
 }
 
 
 void
 real_rungekutta4(
-        double dx,
+        double h,
         double x,
         real_sys_der yprime,
         void * args,
@@ -169,29 +186,29 @@ real_rungekutta4(
     yprime(sys_size, x, y, k1, args);
     for (i = 0; i < sys_size; i++)
     {
-        karg[i] = 0.5 * dx * k1[i] + y[i];
+        karg[i] = 0.5 * h * k1[i] + y[i];
     }
-    yprime(sys_size, x + 0.5 * dx, karg, k2, args);
+    yprime(sys_size, x + 0.5 * h, karg, k2, args);
     for (i = 0; i < sys_size; i++)
     {
-        karg[i] = 0.5 * dx * k2[i] + y[i];
+        karg[i] = 0.5 * h * k2[i] + y[i];
     }
-    yprime(sys_size, x + 0.5 * dx, karg, k3, args);
+    yprime(sys_size, x + 0.5 * h, karg, k3, args);
     for (i = 0; i < sys_size; i++)
     {
-        karg[i] = dx * k3[i] + y[i];
+        karg[i] = h * k3[i] + y[i];
     }
-    yprime(sys_size, x + dx, karg, k4, args);
+    yprime(sys_size, x + h, karg, k4, args);
     for (i = 0; i < sys_size; i++)
     {
-        ynext[i] = y[i] + (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) * dx / 6;
+        ynext[i] = y[i] + (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) * h / 6;
     }
 }
 
 
 void
 cmplx_rungekutta2(
-        double dx,
+        double h,
         double x,
         cmplx_sys_der yprime,
         void * args,
@@ -218,19 +235,19 @@ cmplx_rungekutta2(
     yprime(sys_size, x, y, k1, args);
     for(i = 0; i < sys_size; i++)
     {
-        karg[i] = dx * k1[i] + y[i];
+        karg[i] = h * k1[i] + y[i];
     }
-    yprime(sys_size, x + dx, karg, k2, args);
+    yprime(sys_size, x + h, karg, k2, args);
     for (i = 0; i < sys_size; i++)
     {
-        ynext[i] = y[i] + 0.5 * dx * (k1[i] + k2[i]);
+        ynext[i] = y[i] + 0.5 * h * (k1[i] + k2[i]);
     }
 }
 
 
 void
 real_rungekutta2(
-        double dx,
+        double h,
         double x,
         real_sys_der yprime,
         void * args,
@@ -257,11 +274,11 @@ real_rungekutta2(
     yprime(sys_size, x, y, k1, args);
     for(i = 0; i < sys_size; i++)
     {
-        karg[i] = dx * k1[i] + y[i];
+        karg[i] = h * k1[i] + y[i];
     }
-    yprime(sys_size, x + dx, karg, k2, args);
+    yprime(sys_size, x + h, karg, k2, args);
     for (i = 0; i < sys_size; i++)
     {
-        ynext[i] = y[i] + 0.5 * dx * (k1[i] + k2[i]);
+        ynext[i] = y[i] + 0.5 * h * (k1[i] + k2[i]);
     }
 }

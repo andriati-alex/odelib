@@ -2,13 +2,14 @@
  * \file derivative_signature.h
  * \author Alex Andriati
  * \date July 2021
- * \brief Function signature to evaluate derivatives of ODE system
+ * \brief Function signatures to evaluate derivatives of ODE systems
  *
  * An Ordinary Differential Equation(ODE) system is defined by a set
  * of coupled first order differential equations. Such system always
  * can be made linear in function derivatives, where derivatives can
  * be written as y' = f(x, y) with y a vector of functions values at
- * grid point x
+ * grid point x. These signatures standardize user input function as
+ * well provide general void pointer for extra optional arguments
  */
 
 #ifndef DERIVATIVE_SIGNATURE_H

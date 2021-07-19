@@ -2,6 +2,80 @@
 
 
 void
+alloc_cmplx_multistep_array(ComplexWorkspaceMS ws)
+{
+    unsigned int
+        full_size = ws->ms_order * ws->system_size;
+    ws->prev_der = (Carray) malloc(full_size * sizeof(double complex));
+}
+
+
+void
+alloc_real_multistep_array(RealWorkspaceMS ws)
+{
+    unsigned int
+        full_size = ws->ms_order * ws->system_size;
+    ws->prev_der = (Rarray) malloc(full_size * sizeof(double));
+}
+
+
+void
+free_cmplx_multistep_array(ComplexWorkspaceMS ws)
+{
+    free(ws->prev_der);
+}
+
+
+void
+free_real_multistep_array(RealWorkspaceMS ws)
+{
+    free(ws->prev_der);
+}
+
+
+ComplexWorkspaceMS
+get_cmplx_multistep_ws(unsigned int ms_order, unsigned int sys_size)
+{
+    ComplexWorkspaceMS
+        ws;
+    ws = (ComplexWorkspaceMS) malloc(sizeof(_ComplexWorkspaceMS));
+    ws->ms_order = ms_order;
+    ws->system_size = sys_size;
+    alloc_cmplx_multistep_array(ws);
+    return ws;
+}
+
+
+RealWorkspaceMS
+get_real_multistep_ws(unsigned int ms_order, unsigned int sys_size)
+{
+    RealWorkspaceMS
+        ws;
+    ws = (RealWorkspaceMS) malloc(sizeof(_RealWorkspaceMS));
+    ws->ms_order = ms_order;
+    ws->system_size = sys_size;
+    alloc_real_multistep_array(ws);
+    return ws;
+}
+
+
+void
+free_cmplx_multistep_ws(ComplexWorkspaceMS ws)
+{
+    free(ws->prev_der);
+    free(ws);
+}
+
+
+void
+free_real_multistep_ws(RealWorkspaceMS ws)
+{
+    free(ws->prev_der);
+    free(ws);
+}
+
+
+void
 cmplx_set_next_step(
         double x,
         cmplx_sys_der yprime,

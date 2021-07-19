@@ -1,6 +1,29 @@
+/**
+ * \file quinney_examples.c
+ * \author Alex Andriati
+ * \brief Run simple cases taken from Quinney's book
+ *
+ * Executable to provice a guide on the workflow to use the library.
+ * All the elements from the library are explored, such as optional
+ * arguments passed as struct, user-defined function for system derivatives,
+ * how to cast the optional parameters from void pointer, and usage
+ * of auxiliar function for workspace struct handling. The examples
+ * were taken from:
+ * [1] Douglas Quinney, An introduction to the numerical solution of
+ * differential equations, Revised Edition, 1987, cap. 2
+ * See examples 2.2.2, 2.2.3, 2.2.4 and 2.5.1. This last one, we can
+ * check with the values given in the 2.5.1 for simple RungeKutta of
+ * order 2 (aka simple RungeKutta)
+ *
+ * After build the application, run:
+ * ./quinney_examples <grid_step>
+ * where `grid_step` is a float value and the (max) final point is 1
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "ode_singlestep.h"
+
 
 /** \brief Extra parameters for derivatives computation */
 struct sys_param_set{
@@ -10,13 +33,15 @@ struct sys_param_set{
         coef3;
 };
 
-/** \brief Auxiliar function to copy values and update init input **/
+
+/** \brief Auxiliar function to copy values and update initial input **/
 void copyvalues(int s, Rarray from, Rarray to)
 {
     for (int i = 0; i < s; i++) to[i] = from[i];
 }
 
-/** \brief Routine for system derivatives computation */
+
+/** \brief System derivatives computation with 4 equations */
 void sys_der(int s, double x, Rarray y, Rarray yprime, void * args)
 {
     struct sys_param_set * p = (struct sys_param_set *) args;
@@ -26,22 +51,19 @@ void sys_der(int s, double x, Rarray y, Rarray yprime, void * args)
     yprime[3] = p->coef3 * y[s - 1];
 }
 
+
 int main(int argc, char * argv[])
 {
     int
         nsteps;
-
     double
         h;
-
     struct sys_param_set
         p = { .coef1 = 1.0, .coef2 = 1.0, .coef3 = -1.0 };
-
     Rarray
         yrk2,
         yrk4,
         ynext;
-
     _RealWorkspaceRK
         wsrk;
 
@@ -53,11 +75,10 @@ int main(int argc, char * argv[])
     if (argc == 2) sscanf(argv[1], "%lf", &h);
     else           h = 0.1;
 
-    nsteps = ((int) 1.0 / h) + 1;
+    nsteps = ((int) 1.0005 / h);
 
     wsrk.system_size = 4;
-    real_rkwsarrays_alloc(&wsrk);
-
+    alloc_real_rkwsarrays(&wsrk);
     yrk2  = (double *) malloc(wsrk.system_size * sizeof(double));
     yrk4  = (double *) malloc(wsrk.system_size * sizeof(double));
     ynext = (double *) malloc(wsrk.system_size * sizeof(double));
@@ -79,7 +100,7 @@ int main(int argc, char * argv[])
         copyvalues(wsrk.system_size, ynext, yrk4);
     }
 
-    real_rkwsarrays_free(&wsrk);
+    free_real_rkwsarrays(&wsrk);
     free(yrk2);
     free(yrk4);
     free(ynext);
