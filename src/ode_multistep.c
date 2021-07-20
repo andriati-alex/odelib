@@ -273,5 +273,5 @@ real_general_multistep(
         }
         iter--;
     }
-    real_set_next_step(x, yprime, args, ws, y, ynext);
+    real_set_next_step(x + h, yprime, args, ws, y, ynext);
 }
