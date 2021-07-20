@@ -21,8 +21,14 @@ target_link_libraries(quinney_examples PUBLIC odelib)
 set_target_properties(quinney_examples PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
 
 
+add_executable(quinney_ex282 apps/quinney_ex282.c)
+target_link_libraries(quinney_ex282 PUBLIC odelib)
+set_target_properties(quinney_ex282 PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+
+
 install(TARGETS odelib DESTINATION lib)
 install(TARGETS quinney_examples DESTINATION bin)
+install(TARGETS quinney_ex282 DESTINATION bin)
 
 
 # To install in non-standard directory a shared lib see the Zaffy answer

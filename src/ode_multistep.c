@@ -1,11 +1,12 @@
 #include "ode_multistep.h"
+#include <stdio.h>
 
 
 void
 alloc_cmplx_multistep_array(ComplexWorkspaceMS ws)
 {
     unsigned int
-        full_size = ws->ms_order * ws->system_size;
+        full_size = (ws->ms_order + 1) * ws->system_size;
     ws->prev_der = (Carray) malloc(full_size * sizeof(double complex));
 }
 
@@ -14,7 +15,7 @@ void
 alloc_real_multistep_array(RealWorkspaceMS ws)
 {
     unsigned int
-        full_size = ws->ms_order * ws->system_size;
+        full_size = (ws->ms_order + 1) * ws->system_size;
     ws->prev_der = (Rarray) malloc(full_size * sizeof(double));
 }
 
@@ -200,7 +201,7 @@ cmplx_general_multistep(
         yprime(s, x, ynext, &der[m * s], args);
         for (i = 0; i < s; i++)
         {
-            summ = b[0] * der[i + m * s];
+            summ = h * b[0] * der[i + m * s];
             for (j = 1; j <= m; j++)
             {
                 stride = i + (j - 1) * s;
@@ -210,7 +211,6 @@ cmplx_general_multistep(
         }
         iter--;
     }
-    cmplx_set_next_step(x, yprime, args, ws, y, ynext);
 }
 
 
@@ -263,7 +263,7 @@ real_general_multistep(
         yprime(s, x, ynext, &der[m * s], args);
         for (i = 0; i < s; i++)
         {
-            summ = b[0] * der[i + m * s];
+            summ = h * b[0] * der[i + m * s];
             for (j = 1; j <= m; j++)
             {
                 stride = i + (j - 1) * s;
@@ -273,5 +273,4 @@ real_general_multistep(
         }
         iter--;
     }
-    real_set_next_step(x + h, yprime, args, ws, y, ynext);
 }

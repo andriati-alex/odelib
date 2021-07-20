@@ -91,6 +91,27 @@ free_cmplx_multistep_ws(ComplexWorkspaceMS);
 void
 free_real_multistep_ws(RealWorkspaceMS);
 
+/** \brief Prepare derivatives and solution to propagate next step */
+void
+cmplx_set_next_step(
+        double,
+        cmplx_sys_der,
+        void *,
+        ComplexWorkspaceMS,
+        Carray,
+        Carray
+);
+
+/** \brief Prepare derivatives and solution to propagate next step */
+void
+real_set_next_step(
+        double,
+        real_sys_der,
+        void *,
+        RealWorkspaceMS,
+        Rarray,
+        Rarray
+);
 
 
 /**

@@ -123,6 +123,7 @@ int main(int argc, char * argv[])
         real_general_multistep(
                 h, i * h, &sys_der, &p, &wsms, yms2, a, b, 0, ynext
         );
+        real_set_next_step((i + 1) * h, &sys_der, &p, &wsms, yms2, ynext);
         real_rungekutta2(h, i * h, &sys_der, &p, &wsrk, yrk2, ynext);
         printf(" ");
         for (int j = 0; j < wsrk.system_size; j++) printf(" %.5lf", yrk2[j]);
