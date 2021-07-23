@@ -1,5 +1,5 @@
 /**
- * \file quinney_ex282.c
+ * \file quinney_corretor_iteration.c
  * \author Alex Andriati
  * \brief Run specific predictor corretor iterations example
  *
@@ -8,14 +8,16 @@
  * differential equations, Revised Edition, 1987, cap. 2
  * In this example, one of the simplest predictor-corretor scheme is
  * used in the equation y' = y^2 to show the effect of iterations in
- * the corrector part.
+ * the corrector part. Only one grid step is advanced.
  *
  * After build the application, run:
  * $ ./quinney_ex282 <grid_step>
- * Do 10 iterations in the corrector
+ * Show in screen the result of 10 iterations of the correcotr part.
+ * Within grid step smaller than 0.14 these 10 iterations are enough
+ * to converge all decimal places shown
  *
  * WARNING: The book states that 4th order RungeKutta was used to get
- * the first step required in multistep, bu the result with all those
+ * the first step required in multistep but the result with all those
  * decimal places presented is only achieved from analytical solution
  * From RK4 one shall obtain 1.11111049 instead of 1.11111111 for 0.1
  * as grid step
@@ -59,13 +61,13 @@ int main(int argc, char * argv[])
     bb[1] =  0.5;
     bb[2] =  0.0;
 
+    h = 0.1;
     if (argc > 2)
     {
         printf("\nMax 1 argument accepted. %d given\n\n", argc - 1);
         exit(EXIT_FAILURE);
     }
     if (argc == 2) sscanf(argv[1], "%lf", &h);
-    else           h = 0.1;
     if (h > 0.5)
     {
         printf("\nMax value for grid step is 0.5 but %.1lf given\n", h);
@@ -81,12 +83,12 @@ int main(int argc, char * argv[])
     yms[0] = y1[0];
     yms[1] = y0[0];
     sys_der(wsms.system_size, 0.0, y0, &wsms.prev_der[1], NULL);
-    sys_der(wsms.system_size, 0.0, y1, &wsms.prev_der[0], NULL);
+    sys_der(wsms.system_size, h, y1, &wsms.prev_der[0], NULL);
 
     printf("\n%6.3lf  %11.8lf", 0.0, y0[0]);
     printf("\n%6.3lf  %11.8lf", h, y1[0]);
 
-    real_general_multistep(h, 1 * h, &sys_der, NULL, &wsms, yms, a, b, 0, y0);
+    real_general_multistep(h, h, &sys_der, NULL, &wsms, yms, a, b, 0, y0);
 
     printf("\n%6.3lf  %11.8lf  (predictor)", 2 * h, y0[0]);
 

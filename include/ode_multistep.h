@@ -216,4 +216,70 @@ real_general_multistep
 );
 
 
+/** \brief 4th order Adams-Bashforth(P)-Moulton(C) Predictor-Corrector step
+ *
+ * This routine carry out one step evolution of an ODE system using the 4th
+ * order Adams-Bashforth for predictor and Adams-Moulton for corrector with
+ * particular values for `real_general_multistep` routine
+ *
+ * \param 1 : grid spacing `h`
+ * \param 2 : grid point correspongind to function values `x`
+ * \param 3 : function pointer to routine that compute derivatives
+ * \param 4 : extra arguments required in `cmplx_sys_der` function
+ * \param 5 : Workspace struct address to avoid memory allocation.
+ *            The array within this struct must have at least size
+ *            `(m + 1) * n` due to implicit computation, must have
+ *            derivative of previous steps concatenated as
+ *            `[y'_j y'_j-1 ...  y'_j-3]`
+ * \param 6 : Concatenated function steps required: `[y_j y_j-1 ...  y_j-3]`
+ * \param 7 : Number of iterations for implicit part (Moulton), if
+ *            zero, perform only explicit part (Bashforth)
+ * \param 8: (OUTPUT) solution at next grid step
+ */
+void
+real_adams4pc(
+        double,
+        double,
+        real_sys_der,
+        void *,
+        RealWorkspaceMS,
+        Rarray,
+        unsigned int,
+        Rarray
+);
+
+
+/** \brief 4th order Adams-Bashforth(P)-Moulton(C) Predictor-Corrector step
+ *
+ * This routine carry out one step evolution of an ODE system using the 4th
+ * order Adams-Bashforth for predictor and Adams-Moulton for corrector with
+ * particular values for `real_general_multistep` routine
+ *
+ * \param 1 : grid spacing `h`
+ * \param 2 : grid point correspongind to function values `x`
+ * \param 3 : function pointer to routine that compute derivatives
+ * \param 4 : extra arguments required in `cmplx_sys_der` function
+ * \param 5 : Workspace struct address to avoid memory allocation.
+ *            The array within this struct must have at least size
+ *            `(m + 1) * n` due to implicit computation, must have
+ *            derivative of previous steps concatenated as
+ *            `[y'_j y'_j-1 ...  y'_j-3]`
+ * \param 6 : Concatenated function steps required: `[y_j y_j-1 ...  y_j-3]`
+ * \param 7 : Number of iterations for implicit part (Moulton), if
+ *            zero, perform only explicit part (Bashforth)
+ * \param 8: (OUTPUT) solution at next grid step
+ */
+void
+cmplx_adams4pc(
+        double,
+        double,
+        cmplx_sys_der,
+        void *,
+        ComplexWorkspaceMS,
+        Carray,
+        unsigned int,
+        Carray
+);
+
+
 #endif

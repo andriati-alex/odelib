@@ -79,15 +79,20 @@ int main(int argc, char * argv[])
     a[1] = -1.0;
     b[1] =  1.0;
 
+    h = 0.1;
     if (argc > 2)
     {
         printf("\nMax 1 argument accepted. %d given\n\n", argc - 1);
         exit(EXIT_FAILURE);
     }
     if (argc == 2) sscanf(argv[1], "%lf", &h);
-    else           h = 0.1;
+    if (h > 0.5)
+    {
+        printf("\nMax value for grid step is 0.5 but %.1lf given\n", h);
+        exit(EXIT_FAILURE);
+    }
 
-    nsteps = ((int) 1.0005 / h);
+    nsteps = ((int) (1.0 + h / 2) / h);
 
     wsrk.system_size = 4;
     alloc_real_rkwsarrays(&wsrk);
