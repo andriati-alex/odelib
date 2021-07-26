@@ -7,7 +7,7 @@ alloc_cmplx_multistep_array(ComplexWorkspaceMS ws)
 {
     unsigned int
         full_size = (ws->ms_order + 1) * ws->system_size;
-    ws->prev_der = (Carray) malloc(full_size * sizeof(double complex));
+    ws->prev_der = alloc_carr(full_size);
 }
 
 
@@ -16,7 +16,7 @@ alloc_real_multistep_array(RealWorkspaceMS ws)
 {
     unsigned int
         full_size = (ws->ms_order + 1) * ws->system_size;
-    ws->prev_der = (Rarray) malloc(full_size * sizeof(double));
+    ws->prev_der = alloc_rarr(full_size);
 }
 
 
@@ -40,6 +40,11 @@ get_cmplx_multistep_ws(unsigned int ms_order, unsigned int sys_size)
     ComplexWorkspaceMS
         ws;
     ws = (ComplexWorkspaceMS) malloc(sizeof(_ComplexWorkspaceMS));
+    if (ws == NULL)
+    {
+        printf("\n\nProblem in ComplexWorkspaceMS allocation\n\n");
+        exit(EXIT_FAILURE);
+    }
     ws->ms_order = ms_order;
     ws->system_size = sys_size;
     alloc_cmplx_multistep_array(ws);
@@ -53,6 +58,11 @@ get_real_multistep_ws(unsigned int ms_order, unsigned int sys_size)
     RealWorkspaceMS
         ws;
     ws = (RealWorkspaceMS) malloc(sizeof(_RealWorkspaceMS));
+    if (ws == NULL)
+    {
+        printf("\n\nProbelm in RealWorkspaceMS allocation\n\n");
+        exit(EXIT_FAILURE);
+    }
     ws->ms_order = ms_order;
     ws->system_size = sys_size;
     alloc_real_multistep_array(ws);
@@ -78,7 +88,7 @@ free_real_multistep_ws(RealWorkspaceMS ws)
 
 void
 cmplx_set_next_step(
-        double x_next,
+        double xnext,
         cmplx_sys_der yprime,
         void * args,
         ComplexWorkspaceMS ws,
@@ -93,6 +103,13 @@ cmplx_set_next_step(
         s;
     Carray
         der;
+    _ComplexODEInputParameters
+        sys_params;
+
+    sys_params.x = xnext;
+    sys_params.y = ynext;
+    sys_params.extra_args = args;
+    sys_params.system_size = ws->system_size;
 
     m = ws->ms_order;
     s = ws->system_size;
@@ -110,13 +127,13 @@ cmplx_set_next_step(
     {
         y[i] = ynext[i];
     }
-    yprime(s, x_next, ynext, der, args);
+    yprime(&sys_params, der);
 }
 
 
 void
 real_set_next_step(
-        double x_next,
+        double xnext,
         real_sys_der yprime,
         void * args,
         RealWorkspaceMS ws,
@@ -131,6 +148,13 @@ real_set_next_step(
         s;
     Rarray
         der;
+    _RealODEInputParameters
+        sys_params;
+
+    sys_params.x = xnext;
+    sys_params.y = ynext;
+    sys_params.extra_args = args;
+    sys_params.system_size = ws->system_size;
 
     m = ws->ms_order;
     s = ws->system_size;
@@ -148,7 +172,7 @@ real_set_next_step(
     {
         y[i] = ynext[i];
     }
-    yprime(s, x_next, ynext, der, args);
+    yprime(&sys_params, der);
 }
 
 
@@ -193,12 +217,20 @@ cmplx_general_multistep(
             }
             ynext[i] = summ;
         }
+        return;
     }
+
     /* Implicit scheme used as corrector *
      * `ynext` must provide a prediction */
+    _ComplexODEInputParameters
+        sys_params;
+    sys_params.x = x + h;
+    sys_params.y = ynext;
+    sys_params.extra_args = args;
+    sys_params.system_size = ws->system_size;
     while (iter > 0)
     {
-        yprime(s, x + h, ynext, &der[m * s], args);
+        yprime(&sys_params, &der[m * s]);
         for (i = 0; i < s; i++)
         {
             summ = h * b[0] * der[i + m * s];
@@ -234,7 +266,7 @@ real_general_multistep(
         m,
         s,
         stride;
-    double complex
+    double
         summ;
     Rarray
         der;
@@ -255,12 +287,20 @@ real_general_multistep(
             }
             ynext[i] = summ;
         }
+        return;
     }
+
     /* Implicit scheme used as corrector *
      * `ynext` must provide a prediction */
+    _RealODEInputParameters
+        sys_params;
+    sys_params.x = x + h;
+    sys_params.y = ynext;
+    sys_params.extra_args = args;
+    sys_params.system_size = ws->system_size;
     while (iter > 0)
     {
-        yprime(s, x + h, ynext, &der[m * s], args);
+        yprime(&sys_params, &der[m * s]);
         for (i = 0; i < s; i++)
         {
             summ = h * b[0] * der[i + m * s];

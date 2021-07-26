@@ -29,9 +29,9 @@
 
 
 /** \brief System derivatives with 1 equation */
-void sys_der(int s, double x, Rarray y, Rarray yprime, void * args)
+void sys_der(RealODEInputParameters inp_params, Rarray yprime)
 {
-    yprime[0] = y[0] * y[0];
+    yprime[0] = inp_params->y[0] * inp_params->y[0];
 }
 
 
@@ -48,6 +48,8 @@ int main(int argc, char * argv[])
         yms[2];
     _RealWorkspaceMS
         wsms;
+    _RealODEInputParameters
+        sys_params;
 
     /* See Quinney's book predictor example 2.8.1 */
     a[1] = -1.0;
@@ -74,6 +76,8 @@ int main(int argc, char * argv[])
         exit(EXIT_FAILURE);
     }
 
+    sys_params.system_size = 1;
+    sys_params.extra_args = NULL;
     wsms.ms_order = 2;
     wsms.system_size = 1;
     alloc_real_multistep_array(&wsms);
@@ -82,16 +86,23 @@ int main(int argc, char * argv[])
     y1[0] = 1.0 / (1 - h);  /* Exact solution instead of RK4 */
     yms[0] = y1[0];
     yms[1] = y0[0];
-    sys_der(wsms.system_size, 0.0, y0, &wsms.prev_der[1], NULL);
-    sys_der(wsms.system_size, h, y1, &wsms.prev_der[0], NULL);
+
+    /* compute initial 2 derivatives required in this multistep scheme */
+    sys_params.y = y0;
+    sys_params.x = 0;
+    sys_der(&sys_params, &wsms.prev_der[1]);
+    sys_params.y = y1;
+    sys_params.x = h;
+    sys_der(&sys_params, &wsms.prev_der[0]);
 
     printf("\n%6.3lf  %11.8lf", 0.0, y0[0]);
     printf("\n%6.3lf  %11.8lf", h, y1[0]);
 
+    /* Make prediction */
     real_general_multistep(h, h, &sys_der, NULL, &wsms, yms, a, b, 0, y0);
-
     printf("\n%6.3lf  %11.8lf  (predictor)", 2 * h, y0[0]);
 
+    /* Make corrections */
     for (int i = 0; i < 10; i++)
     {
         real_general_multistep(

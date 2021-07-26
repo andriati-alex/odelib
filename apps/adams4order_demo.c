@@ -28,16 +28,11 @@
 #include "ode_multistep.h"
 
 
-/** \brief Auxiliar function to copy values and update in time propagation **/
-void copyvalues(int s, Rarray from, Rarray to)
-{
-    for (int i = 0; i < s; i++) to[i] = from[i];
-}
-
-
 /** \brief System derivatives with 4 equations */
-void sys_der(int s, double x, Rarray y, Rarray yprime, void * args)
+void sys_der(RealODEInputParameters inp_params, Rarray yprime)
 {
+    double x = inp_params->x;
+    Rarray y = inp_params->y;
     yprime[0] = y[0] + x;
     yprime[1] = y[1] / (1 + x * x);
     yprime[2] = y[2] * y[2] * x;
@@ -62,6 +57,8 @@ int main(int argc, char * argv[])
         wsrk;
     _RealWorkspaceMS
         wsms;
+    _RealODEInputParameters
+        sys_params;
 
     if (argc > 3)
     {
@@ -93,14 +90,18 @@ int main(int argc, char * argv[])
     wsms.ms_order = 4;
     wsms.system_size = 4;
     alloc_real_multistep_array(&wsms);
+    sys_params.system_size = 4;
+    sys_params.extra_args = NULL;
 
-    copyvalues(wsrk.system_size, y0, yrk4);
+    rarr_copy_values(wsrk.system_size, y0, yrk4);
     for (i = 0; i < wsms.ms_order; i++)
     {
-        copyvalues(wsrk.system_size, yrk4, y0);
+        rarr_copy_values(wsrk.system_size, yrk4, y0);
+        sys_params.x = i * h;
+        sys_params.y = yrk4;
         j = (wsms.ms_order - 1 - i) * wsms.system_size;
-        sys_der(wsms.system_size, i * h, yrk4, &wsms.prev_der[j], NULL);
-        copyvalues(wsms.system_size, yrk4, &yabm[j]);
+        sys_der(&sys_params, &wsms.prev_der[j]);
+        rarr_copy_values(wsms.system_size, yrk4, &yabm[j]);
         printf("\n%6.3lf", i * h);
         for (j = 0; j < wsrk.system_size; j++) printf(" %11.8lf", yrk4[j]);
         for (j = 0; j < wsms.system_size; j++) printf(" %17.14lf", yrk4[j]);
@@ -108,14 +109,14 @@ int main(int argc, char * argv[])
     }
 
     /* recede the extra step unduly advanced in rk4 */
-    copyvalues(wsrk.system_size, y0, yrk4);
+    rarr_copy_values(wsrk.system_size, y0, yrk4);
 
     for (i = 3; i < nsteps; i++)
     {
         real_adams4pc(h, i * h, &sys_der, NULL, &wsms, yabm, niter, yabm_next);
         real_set_next_step((i + 1) * h, &sys_der, NULL, &wsms, yabm, yabm_next);
         real_rungekutta4(h, i * h, &sys_der, NULL, &wsrk, y0, yrk4);
-        copyvalues(wsrk.system_size, yrk4, y0);
+        rarr_copy_values(wsrk.system_size, yrk4, y0);
         printf("\n%6.3lf", (i + 1) * h);
         for (j = 0; j < wsrk.system_size; j++)
             printf(" %11.8lf", yrk4[j]);

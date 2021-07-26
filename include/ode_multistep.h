@@ -11,7 +11,6 @@
 #ifndef ODE_MULTISTEP_H
 #define ODE_MULTISTEP_H
 
-#include <stdlib.h>
 #include "derivative_signature.h"
 
 /** \brief Struct to provide complex workspace for multistep methods

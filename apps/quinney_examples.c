@@ -29,7 +29,7 @@
 
 
 /** \brief Extra parameters for derivatives computation */
-struct sys_param_set{
+struct sys_extra_param{
     double
         coef1,
         coef2,
@@ -37,21 +37,18 @@ struct sys_param_set{
 };
 
 
-/** \brief Auxiliar function to copy values and update in time propagation **/
-void copyvalues(int s, Rarray from, Rarray to)
-{
-    for (int i = 0; i < s; i++) to[i] = from[i];
-}
-
-
 /** \brief System derivatives with 4 equations */
-void sys_der(int s, double x, Rarray y, Rarray yprime, void * args)
+void sys_der(RealODEInputParameters inp_params, Rarray yprime)
 {
-    struct sys_param_set * p = (struct sys_param_set *) args;
+    struct sys_extra_param * p = (
+            (struct sys_extra_param *) inp_params->extra_args
+    );
+    double x = inp_params->x;
+    Rarray y = inp_params->y;
     yprime[0] = p->coef1 * y[0] + x;
     yprime[1] = p->coef2 * y[1] / (1 + x * x);
     yprime[2] = y[2] * y[2] * x;
-    yprime[3] = p->coef3 * y[s - 1];
+    yprime[3] = p->coef3 * y[3];
 }
 
 
@@ -63,22 +60,28 @@ int main(int argc, char * argv[])
         h,
         a[2],
         b[2];
-    struct sys_param_set
-        p = { .coef1 = 1.0, .coef2 = 1.0, .coef3 = -1.0 };
     Rarray
         yrk2,   /* solution of 2nd order RungeKutta */
         yrk4,   /* solution of 4th order RungeKutta */
         yms2,   /* solution of 1st order multistep  */
-        ynext;
+        ynext;  /* Hold temporary integrator result */
     _RealWorkspaceRK
         wsrk;
     _RealWorkspaceMS
         wsms;
+    struct sys_extra_param
+        p = { .coef1 = 1.0, .coef2 = 1.0, .coef3 = -1.0 };
+    _RealODEInputParameters
+        sys_params;
+
+    sys_params.system_size = 4;
+    sys_params.extra_args = &p;
 
     /* These coefficients in multistep yield the Euler's method */
     a[1] = -1.0;
     b[1] =  1.0;
 
+    /* Set input grid step and compute number of steps to finish at 1 */
     h = 0.1;
     if (argc > 2)
     {
@@ -91,9 +94,9 @@ int main(int argc, char * argv[])
         printf("\nMax value for grid step is 0.5 but %.1lf given\n", h);
         exit(EXIT_FAILURE);
     }
-
     nsteps = ((int) (1.0 + h / 2) / h);
 
+    /* workspace and arrays needed in integrators allocation */
     wsrk.system_size = 4;
     alloc_real_rkwsarrays(&wsrk);
     wsms.ms_order = 1;
@@ -104,14 +107,17 @@ int main(int argc, char * argv[])
     yms2  = (double *) malloc(wsms.system_size * sizeof(double));
     ynext = (double *) malloc(wsrk.system_size * sizeof(double));
 
+    /* set initial condition for each integrator used */
     for (int i = 0; i < wsrk.system_size; i++)
     {
         yrk2[i] = 1.0;
         yrk4[i] = 1.0;
-        /* This specific case only one step is required for multistep */
-        yms2[i] = 1.0;
-        sys_der(wsms.system_size, 0, yms2, wsms.prev_der, &p);
+        yms2[i] = 1.0; // In this case only one step is required for multistep
     }
+    /* compute first derivative required for multistep method */
+    sys_params.x = 0;
+    sys_params.y = yms2;
+    sys_der(&sys_params, wsms.prev_der);
 
     /* header for screen output */
     printf("\nstep x");
@@ -119,7 +125,7 @@ int main(int argc, char * argv[])
     printf("            Rungekutta2          ");
     printf("            Rungekutta4");
     printf("\n----------------------------------------------------");
-    printf("-----------------------------------------------------");
+    printf("------------------------------------------------------");
 
     for (int i = 0; i <= nsteps; i++)
     {
@@ -132,17 +138,18 @@ int main(int argc, char * argv[])
         real_rungekutta2(h, i * h, &sys_der, &p, &wsrk, yrk2, ynext);
         printf(" ");
         for (int j = 0; j < wsrk.system_size; j++) printf(" %.5lf", yrk2[j]);
-        copyvalues(wsrk.system_size, ynext, yrk2);
+        rarr_copy_values(wsrk.system_size, ynext, yrk2);
         real_rungekutta4(h, i * h, &sys_der, &p, &wsrk, yrk4, ynext);
         printf(" ");
         for (int j = 0; j < wsrk.system_size; j++) printf(" %.5lf", yrk4[j]);
-        copyvalues(wsrk.system_size, ynext, yrk4);
+        rarr_copy_values(wsrk.system_size, ynext, yrk4);
     }
 
     free_real_rkwsarrays(&wsrk);
     free_real_multistep_array(&wsms);
     free(yrk2);
     free(yrk4);
+    free(yms2);
     free(ynext);
 
     printf("\n\n");

@@ -97,7 +97,7 @@ free_cmplx_rkws(ComplexWorkspaceRK);
  * \param 2 : grid point correspongind to function values `x`
  * \param 3 : function pointing to routine that compute derivatives
  * \param 4 : extra arguments required in `cmplx_sys_der` function
- * \param 5 : Workspace struct address to avoid memory allocation
+ * \param 5 : Workspace struct address for internal derivative computation
  * \param 6 : function values `y` computed at grid point `x`
  * \param 7 : (OUTPUT) function values at next grid point `x + h`
  */
@@ -121,7 +121,7 @@ cmplx_rungekutta4
  * \param 2 : grid point correspongind to function values `x`
  * \param 3 : function pointing to routine that compute derivatives
  * \param 4 : extra arguments required in `cmplx_sys_der` function
- * \param 5 : Workspace struct address to avoid memory allocation
+ * \param 5 : Workspace struct address for internal derivative computation
  * \param 6 : function values `y` computed at grid point `x`
  * \param 7 : (OUTPUT) function values at next grid point `x + h`
  */
