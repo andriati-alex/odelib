@@ -42,7 +42,7 @@ typedef _ComplexODEInputParameters * ComplexODEInputParameters;
 /**
  * \brief Function signature to compute derivatives of real ODE system
  *
- * \param 1 : Struct with input system parameters
+ * \param 1 : Struct with input system parameters required
  * \param 2 : (OUTPUT) function derivatives at current grid point
  */
 typedef void (*real_odesys_der)(RealODEInputParameters, Rarray);
@@ -50,7 +50,7 @@ typedef void (*real_odesys_der)(RealODEInputParameters, Rarray);
 /**
  * \brief Function signature to compute derivatives of complex ODE system
  *
- * \param 1 : Struct with input system parameters
+ * \param 1 : Struct with input system parameters required
  * \param 2 : (OUTPUT) function derivatives at current grid point
  */
 typedef void (*cplx_odesys_der)(ComplexODEInputParameters, Carray);

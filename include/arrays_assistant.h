@@ -11,9 +11,13 @@
  * otherwise warning will be prompt in compilation
  */
 
+#ifndef ARRAYS_ASSISTANT_H
+#define ARRAYS_ASSISTANT_H
+
 #include "arrays.h"
 #include <stdlib.h>
 #include <stdio.h>
+
 
 /** \brief Return fresh allocated real(double) array */
 static Rarray
@@ -57,3 +61,6 @@ rarr_copy_values(unsigned int array_size, Rarray from, Rarray to)
 {
     for (unsigned int i = 0; i < array_size; i++) to[i] = from[i];
 }
+
+
+#endif

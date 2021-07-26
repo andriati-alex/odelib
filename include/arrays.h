@@ -8,7 +8,7 @@
  * using pointers to real or complex numbers, here as double or
  * double complex pointer
  *
- * \note Developers whishing to contrinute see `arrays_assistant.h`
+ * \note Developers whishing to contrinute see arrays_assistant.h
  *       which provide `static` implementation of basic functions
  */
 

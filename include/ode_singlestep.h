@@ -62,12 +62,12 @@ void
 alloc_real_rungekutta_wsarrays(RealWorkspaceRK);
 
 
-/** \brief Free internal struct pointers given */
+/** \brief Free internal pointers of struct given */
 void
 free_cplx_rungekutta_wsarrays(ComplexWorkspaceRK);
 
 
-/** \brief Free internal struct pointers given */
+/** \brief Free internal pointers of struct given */
 void
 free_real_rungekutta_wsarrays(RealWorkspaceRK);
 
@@ -96,11 +96,11 @@ destroy_cplx_rungekutta_ws(ComplexWorkspaceRK);
  * \brief 4th order Runge-Kutta method step integration
  *
  * \param 1 : grid spacing `h`
- * \param 2 : grid point correspongind to function values `x`
+ * \param 2 : current grid point `x`
  * \param 3 : function pointing to routine that compute derivatives
- * \param 4 : extra arguments required in `cplx_odesys_der` function
+ * \param 4 : extra arguments (void pointer in _ComplexWorkspaceRK)
  * \param 5 : Workspace struct address for internal derivative computation
- * \param 6 : function values `y` computed at grid point `x`
+ * \param 6 : function values `y` computed at current grid point
  * \param 7 : (OUTPUT) function values at next grid point `x + h`
  */
 void
@@ -120,11 +120,11 @@ cplx_rungekutta4
  * \brief 4th order Runge-Kutta method step integration
  *
  * \param 1 : grid spacing `h`
- * \param 2 : grid point correspongind to function values `x`
+ * \param 2 : current grid point `x`
  * \param 3 : function pointing to routine that compute derivatives
- * \param 4 : extra arguments required in `cplx_odesys_der` function
+ * \param 4 : extra arguments (void pointer in _RealWorkspaceRK)
  * \param 5 : Workspace struct address for internal derivative computation
- * \param 6 : function values `y` computed at grid point `x`
+ * \param 6 : function values `y` computed at current grid point `x`
  * \param 7 : (OUTPUT) function values at next grid point `x + h`
  */
 void
@@ -144,11 +144,11 @@ real_rungekutta4
  * \brief 2nd order (simple)Runge-Kutta method step integration
  *
  * \param 1 : grid spacing `h`
- * \param 2 : grid point correspongind to function values `x`
+ * \param 2 : current grid point `x`
  * \param 3 : function pointing to routine that compute derivatives
- * \param 4 : extra arguments required in `cplx_odesys_der` function
+ * \param 4 : extra arguments (void pointer in _ComplexWorkspaceRK)
  * \param 5 : Workspace struct address to avoid memory allocation
- * \param 6 : function values `y` computed at grid point `x`
+ * \param 6 : function values `y` computed at current grid point `x`
  * \param 7 : (OUTPUT) function values at next grid point `x + h`
  */
 void
@@ -168,11 +168,11 @@ cplx_rungekutta2
  * \brief 2nd order Runge-Kutta method step integration
  *
  * \param 1 : grid spacing `h`
- * \param 2 : grid point correspongind to function values `x`
+ * \param 2 : current grid point `x`
  * \param 3 : function pointing to routine that compute derivatives
- * \param 4 : extra arguments required in `cplx_odesys_der` function
+ * \param 4 : extra arguments (void pointer in _RealWorkspaceRK)
  * \param 5 : Workspace struct address to avoid memory allocation
- * \param 6 : function values `y` computed at grid point `x`
+ * \param 6 : function values `y` computed at current grid point `x`
  * \param 7 : (OUTPUT) function values at next grid point `x + h`
  */
 void

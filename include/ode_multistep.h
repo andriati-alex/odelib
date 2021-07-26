@@ -17,7 +17,7 @@
  *
  * Provide basic data to simplify the general multistep methods API,
  * with max number of previous steps required, system size and array
- * with all previous derivatives pre-computed
+ * with all demanded previous derivatives pre-computed
  */
 typedef struct{
     int
@@ -34,7 +34,7 @@ typedef _ComplexWorkspaceMS * ComplexWorkspaceMS;
  *
  * Provide basic data to simplify the general multistep methods API,
  * with max number of previous steps required, system size and array
- * with all previous derivatives pre-computed
+ * with all demanded previous derivatives pre-computed
  */
 typedef struct{
     int
@@ -90,7 +90,25 @@ destroy_cplx_multistep_ws(ComplexWorkspaceMS);
 void
 destroy_real_multistep_ws(RealWorkspaceMS);
 
-/** \brief Prepare derivatives and solution to propagate next step */
+/** \brief Prepare system to propagate next step of multistep method
+ *
+ * Since multiple steps are required and they are consumed by API as
+ * a concatenation of arrays in a unique array, this function assist
+ * the input configuration of next step. For that, chunks of concat.
+ * data are displaced, as effect making known steps older. After the
+ * `real_general_multistep` routine is called the workspace and previous
+ * steps must be update to continue, and this routine automate these
+ * operations. See `cplx_general_multistep` (specially param 6)
+ *
+ * \param 1 : next (fresh computed system solution) grid point
+ * \param 2 : routine that compute system derivative
+ * \param 3 : extra arguments (void pointer of *ODEInputParameters struct)
+ * \param 4 : (MODIFIED) Workspace struct address with previous derivatives
+ *           used in param6 of `cplx_general_multistep` to generate param 5
+ * \param 4 : (MODIFIED) Set of known previous steps used in param 6 of
+ *           `cplx_general_multistep` to generate param 5
+ * \param 5 : Fresh computed system solution at next grid point
+ */
 void
 cplx_set_next_multistep(
         double,
@@ -101,7 +119,25 @@ cplx_set_next_multistep(
         Carray
 );
 
-/** \brief Prepare derivatives and solution to propagate next step */
+/** \brief Prepare system to propagate next step of multistep method
+ *
+ * Since multiple steps are required and they are consumed by API as
+ * a concatenation of arrays in a unique array, this function assist
+ * the input configuration of next step. For that, chunks of concat.
+ * data are displaced, as effect making known steps older. After the
+ * `real_general_multistep` routine is called the workspace and previous
+ * steps must be update to continue, and this routine automate these
+ * operations. See `real_general_multistep` (specially param 6)
+ *
+ * \param 1 : next (fresh computed system solution) grid point
+ * \param 2 : routine that compute system derivative
+ * \param 3 : extra arguments (void pointer of *ODEInputParameters struct)
+ * \param 4 : (MODIFIED) Workspace struct address with previous derivatives
+ *           used in param 6 of `real_general_multistep` to generate param 5
+ * \param 4 : (MODIFIED) Set of known previous steps used in param 6 of
+ *           `real_general_multistep` to generate param 5
+ * \param 5 : Fresh computed system solution at next grid point
+ */
 void
 real_set_next_multistep(
         double,
@@ -121,11 +157,13 @@ real_set_next_multistep(
  * coefficients as
  * `a[0] * y_j+1 + a[1] * y_j + ... + a[m] * y_j+1-m =
  *          h * (b[0] * y'_j+1 + b[1] * y'_j + ... + b[m] * y'_j+1-m)`
+ *  where `y_j+1` is the unknown part computed in this routine and `m`
+ *  is the multistep order (not necessarily related to accuracy)
  *
  * \param 1 : grid spacing `h`
- * \param 2 : grid point correspongind to function values `x`
+ * \param 2 : grid point `x` correspongind to function values
  * \param 3 : function pointer to routine that compute derivatives
- * \param 4 : extra arguments required in `cplx_odesys_der` function
+ * \param 4 : extra arguments (void pointer of _RealODEInputParameters struct)
  * \param 5 : Workspace struct address to avoid memory allocation.
  *            The array within this struct must have at least size
  *            `m * n` if the method is explicit, and `(m + 1) * n`
@@ -143,8 +181,7 @@ real_set_next_multistep(
  *            in right-hand-side `h * (b[0] * y'_j+1 + b[1] * y'_j + ...
  *            b[m] * y'_j+1-m`. `b[0]` will be used depending on param 9
  * \param 9 : Number of iterations for implicit method if greater than 0
- *            If zero ignore first element of param 8 and apply explicit
- *            scheme, equivalent to using zero and set this param to 1
+ *            If zero, ignore first element of param 8
  * \param 10: (OUTPUT) solution at next grid step
  *            (INPUT)  use as predictor if parameter 9 is greater than 0
  */
@@ -172,9 +209,11 @@ cplx_general_multistep
  * coefficients as
  * `a[0] * y_j+1 + a[1] * y_j + ... + a[m] * y_j+1-m =
  *          h * (b[0] * y'_j+1 + b[1] * y'_j + ... + b[m] * y'_j+1-m)`
+ *  where `y_j+1` is the unknown part computed in this routine and `m`
+ *  is the multistep order (not necessarily related to accuracy)
  *
  * \param 1 : grid spacing `h`
- * \param 2 : grid point correspongind to function values `x`
+ * \param 2 : grid point `x` correspongind to function values
  * \param 3 : function pointer to routine that compute derivatives
  * \param 4 : extra arguments required in `cplx_odesys_der` function
  * \param 5 : Workspace struct address to avoid memory allocation.
@@ -194,8 +233,7 @@ cplx_general_multistep
  *            in right-hand-side `h * (b[0] * y'_j+1 + b[1] * y'_j + ...
  *            b[m] * y'_j+1-m`. `b[0]` will be used depending on param 9
  * \param 9 : Number of iterations for implicit method if greater than 0
- *            If zero ignore first element of param 8 and apply explicit
- *            scheme, equivalent to using zero and set this param to 1
+ *            If zero, ignore first element of param 8
  * \param 10: (OUTPUT) solution at next grid step
  *            (INPUT)  use as predictor if parameter 9 is greater than 0
  */
@@ -219,7 +257,7 @@ real_general_multistep
  *
  * This routine carry out one step evolution of an ODE system using the 4th
  * order Adams-Bashforth for predictor and Adams-Moulton for corrector with
- * particular values for `real_general_multistep` routine
+ * particular case of `real_general_multistep` routine
  *
  * \param 1 : grid spacing `h`
  * \param 2 : grid point correspongind to function values `x`
@@ -227,7 +265,7 @@ real_general_multistep
  * \param 4 : extra arguments required in `cplx_odesys_der` function
  * \param 5 : Workspace struct address to avoid memory allocation.
  *            The array within this struct must have at least size
- *            `(m + 1) * n` due to implicit computation, must have
+ *            `5 * sys_size` due to implicit computation. Must have
  *            derivative of previous steps concatenated as
  *            `[y'_j y'_j-1 ...  y'_j-3]`
  * \param 6 : Concatenated function steps required: `[y_j y_j-1 ...  y_j-3]`
@@ -252,7 +290,7 @@ real_adams4pc(
  *
  * This routine carry out one step evolution of an ODE system using the 4th
  * order Adams-Bashforth for predictor and Adams-Moulton for corrector with
- * particular values for `real_general_multistep` routine
+ * particular case of `real_general_multistep` routine
  *
  * \param 1 : grid spacing `h`
  * \param 2 : grid point correspongind to function values `x`
@@ -260,7 +298,7 @@ real_adams4pc(
  * \param 4 : extra arguments required in `cplx_odesys_der` function
  * \param 5 : Workspace struct address to avoid memory allocation.
  *            The array within this struct must have at least size
- *            `(m + 1) * n` due to implicit computation, must have
+ *            `5 * sys_size` due to implicit computation. Must have
  *            derivative of previous steps concatenated as
  *            `[y'_j y'_j-1 ...  y'_j-3]`
  * \param 6 : Concatenated function steps required: `[y_j y_j-1 ...  y_j-3]`
