@@ -3,7 +3,7 @@
 
 
 void
-alloc_cmplx_multistep_array(ComplexWorkspaceMS ws)
+alloc_cplx_multistep_wsarray(ComplexWorkspaceMS ws)
 {
     unsigned int
         full_size = (ws->ms_order + 1) * ws->system_size;
@@ -12,7 +12,7 @@ alloc_cmplx_multistep_array(ComplexWorkspaceMS ws)
 
 
 void
-alloc_real_multistep_array(RealWorkspaceMS ws)
+alloc_real_multistep_wsarray(RealWorkspaceMS ws)
 {
     unsigned int
         full_size = (ws->ms_order + 1) * ws->system_size;
@@ -21,21 +21,21 @@ alloc_real_multistep_array(RealWorkspaceMS ws)
 
 
 void
-free_cmplx_multistep_array(ComplexWorkspaceMS ws)
+free_cplx_multistep_wsarray(ComplexWorkspaceMS ws)
 {
     free(ws->prev_der);
 }
 
 
 void
-free_real_multistep_array(RealWorkspaceMS ws)
+free_real_multistep_wsarray(RealWorkspaceMS ws)
 {
     free(ws->prev_der);
 }
 
 
 ComplexWorkspaceMS
-get_cmplx_multistep_ws(unsigned int ms_order, unsigned int sys_size)
+get_cplx_multistep_ws(unsigned int ms_order, unsigned int sys_size)
 {
     ComplexWorkspaceMS
         ws;
@@ -47,7 +47,7 @@ get_cmplx_multistep_ws(unsigned int ms_order, unsigned int sys_size)
     }
     ws->ms_order = ms_order;
     ws->system_size = sys_size;
-    alloc_cmplx_multistep_array(ws);
+    alloc_cplx_multistep_wsarray(ws);
     return ws;
 }
 
@@ -65,13 +65,13 @@ get_real_multistep_ws(unsigned int ms_order, unsigned int sys_size)
     }
     ws->ms_order = ms_order;
     ws->system_size = sys_size;
-    alloc_real_multistep_array(ws);
+    alloc_real_multistep_wsarray(ws);
     return ws;
 }
 
 
 void
-free_cmplx_multistep_ws(ComplexWorkspaceMS ws)
+destroy_cplx_multistep_ws(ComplexWorkspaceMS ws)
 {
     free(ws->prev_der);
     free(ws);
@@ -79,7 +79,7 @@ free_cmplx_multistep_ws(ComplexWorkspaceMS ws)
 
 
 void
-free_real_multistep_ws(RealWorkspaceMS ws)
+destroy_real_multistep_ws(RealWorkspaceMS ws)
 {
     free(ws->prev_der);
     free(ws);
@@ -87,9 +87,9 @@ free_real_multistep_ws(RealWorkspaceMS ws)
 
 
 void
-cmplx_set_next_step(
+cplx_set_next_multistep(
         double xnext,
-        cmplx_sys_der yprime,
+        cplx_odesys_der yprime,
         void * args,
         ComplexWorkspaceMS ws,
         Carray y,
@@ -106,14 +106,14 @@ cmplx_set_next_step(
     _ComplexODEInputParameters
         sys_params;
 
-    sys_params.x = xnext;
-    sys_params.y = ynext;
-    sys_params.extra_args = args;
-    sys_params.system_size = ws->system_size;
-
     m = ws->ms_order;
     s = ws->system_size;
     der = ws->prev_der;
+
+    sys_params.x = xnext;
+    sys_params.y = ynext;
+    sys_params.system_size = s;
+    sys_params.extra_args = args;
 
     for (j = m - 1; j > 0; j--)
     {
@@ -129,9 +129,9 @@ cmplx_set_next_step(
 
 
 void
-real_set_next_step(
+real_set_next_multistep(
         double xnext,
-        real_sys_der yprime,
+        real_odesys_der yprime,
         void * args,
         RealWorkspaceMS ws,
         Rarray y,
@@ -148,14 +148,14 @@ real_set_next_step(
     _RealODEInputParameters
         sys_params;
 
-    sys_params.x = xnext;
-    sys_params.y = ynext;
-    sys_params.extra_args = args;
-    sys_params.system_size = ws->system_size;
-
     m = ws->ms_order;
     s = ws->system_size;
     der = ws->prev_der;
+
+    sys_params.x = xnext;
+    sys_params.y = ynext;
+    sys_params.system_size = s;
+    sys_params.extra_args = args;
 
     for (j = m - 1; j > 0; j--)
     {
@@ -171,10 +171,10 @@ real_set_next_step(
 
 
 void
-cmplx_general_multistep(
+cplx_general_multistep(
         double h,
         double x,
-        cmplx_sys_der yprime,
+        cplx_odesys_der yprime,
         void * args,
         ComplexWorkspaceMS ws,
         Carray y,
@@ -244,7 +244,7 @@ void
 real_general_multistep(
         double h,
         double x,
-        real_sys_der yprime,
+        real_odesys_der yprime,
         void * args,
         RealWorkspaceMS ws,
         Rarray y,
@@ -314,7 +314,7 @@ void
 real_adams4pc(
         double h,
         double x,
-        real_sys_der yprime,
+        real_odesys_der yprime,
         void * args,
         RealWorkspaceMS ws,
         Rarray y,
@@ -339,10 +339,10 @@ real_adams4pc(
 
 
 void
-cmplx_adams4pc(
+cplx_adams4pc(
         double h,
         double x,
-        cmplx_sys_der yprime,
+        cplx_odesys_der yprime,
         void * args,
         ComplexWorkspaceMS ws,
         Carray y,
@@ -360,7 +360,7 @@ cmplx_adams4pc(
         bp[i] = bp[i] / 24;
         bc[i] = bc[i] / 24;
     }
-    cmplx_general_multistep(h, x, yprime, args, ws, y, ap, bp, 0, ynext);
+    cplx_general_multistep(h, x, yprime, args, ws, y, ap, bp, 0, ynext);
     if (iter == 0) return;
-    cmplx_general_multistep(h, x, yprime, args, ws, y, ac, bc, iter, ynext);
+    cplx_general_multistep(h, x, yprime, args, ws, y, ac, bc, iter, ynext);
 }

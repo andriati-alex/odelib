@@ -51,43 +51,45 @@ typedef struct{
 /** \brief Struct workspace address for single step methods */
 typedef _RealWorkspaceRK * RealWorkspaceRK;
 
-/** \brief Alloc struct internal arrays */
-void
-alloc_cmplx_rkwsarrays(ComplexWorkspaceRK);
 
-/** \brief Alloc struct internal arrays */
+/** \brief Alloc internal arrays in struct address given */
 void
-alloc_real_rkwsarrays(RealWorkspaceRK);
+alloc_cplx_rungekutta_wsarrays(ComplexWorkspaceRK);
 
-/** \brief Free internal struct pointers */
+
+/** \brief Alloc internal arrays in struct address given */
 void
-free_cmplx_rkwsarrays(ComplexWorkspaceRK);
+alloc_real_rungekutta_wsarrays(RealWorkspaceRK);
 
-/** \brief Free internal struct pointers */
+
+/** \brief Free internal struct pointers given */
 void
-free_real_rkwsarrays(RealWorkspaceRK);
+free_cplx_rungekutta_wsarrays(ComplexWorkspaceRK);
 
-/** \brief Return fresh allocated struct address with internal fields set
- *
- * \param : system size
- */
+
+/** \brief Free internal struct pointers given */
+void
+free_real_rungekutta_wsarrays(RealWorkspaceRK);
+
+
+/** \brief Return fresh allocated struct address with internal fields set */
 ComplexWorkspaceRK
-get_cmplx_rkws(int);
+get_cplx_rungekutta_ws(int sys_size);
 
-/** \brief Return fresh allocated struct address with internal fields set
- *
- * \param : system size
- */
+
+/** \brief Return fresh allocated struct address with internal fields set */
 RealWorkspaceRK
-get_real_rkws(int);
+get_real_rungekutta_ws(int sys_size);
+
 
 /** \brief Free allocated workspace struct and its internal arrays */
 void
-free_real_rkws(RealWorkspaceRK);
+destroy_real_rungekutta_ws(RealWorkspaceRK);
+
 
 /** \brief Free allocated workspace struct and its internal arrays */
 void
-free_cmplx_rkws(ComplexWorkspaceRK);
+destroy_cplx_rungekutta_ws(ComplexWorkspaceRK);
 
 
 /**
@@ -96,17 +98,17 @@ free_cmplx_rkws(ComplexWorkspaceRK);
  * \param 1 : grid spacing `h`
  * \param 2 : grid point correspongind to function values `x`
  * \param 3 : function pointing to routine that compute derivatives
- * \param 4 : extra arguments required in `cmplx_sys_der` function
+ * \param 4 : extra arguments required in `cplx_odesys_der` function
  * \param 5 : Workspace struct address for internal derivative computation
  * \param 6 : function values `y` computed at grid point `x`
  * \param 7 : (OUTPUT) function values at next grid point `x + h`
  */
 void
-cmplx_rungekutta4
+cplx_rungekutta4
 (
         double,
         double,
-        cmplx_sys_der,
+        cplx_odesys_der,
         void *,
         ComplexWorkspaceRK,
         Carray,
@@ -120,7 +122,7 @@ cmplx_rungekutta4
  * \param 1 : grid spacing `h`
  * \param 2 : grid point correspongind to function values `x`
  * \param 3 : function pointing to routine that compute derivatives
- * \param 4 : extra arguments required in `cmplx_sys_der` function
+ * \param 4 : extra arguments required in `cplx_odesys_der` function
  * \param 5 : Workspace struct address for internal derivative computation
  * \param 6 : function values `y` computed at grid point `x`
  * \param 7 : (OUTPUT) function values at next grid point `x + h`
@@ -130,7 +132,7 @@ real_rungekutta4
 (
         double,
         double,
-        real_sys_der,
+        real_odesys_der,
         void *,
         RealWorkspaceRK,
         Rarray,
@@ -144,17 +146,17 @@ real_rungekutta4
  * \param 1 : grid spacing `h`
  * \param 2 : grid point correspongind to function values `x`
  * \param 3 : function pointing to routine that compute derivatives
- * \param 4 : extra arguments required in `cmplx_sys_der` function
+ * \param 4 : extra arguments required in `cplx_odesys_der` function
  * \param 5 : Workspace struct address to avoid memory allocation
  * \param 6 : function values `y` computed at grid point `x`
  * \param 7 : (OUTPUT) function values at next grid point `x + h`
  */
 void
-cmplx_rungekutta2
+cplx_rungekutta2
 (
         double,
         double,
-        cmplx_sys_der,
+        cplx_odesys_der,
         void *,
         ComplexWorkspaceRK,
         Carray,
@@ -168,7 +170,7 @@ cmplx_rungekutta2
  * \param 1 : grid spacing `h`
  * \param 2 : grid point correspongind to function values `x`
  * \param 3 : function pointing to routine that compute derivatives
- * \param 4 : extra arguments required in `cmplx_sys_der` function
+ * \param 4 : extra arguments required in `cplx_odesys_der` function
  * \param 5 : Workspace struct address to avoid memory allocation
  * \param 6 : function values `y` computed at grid point `x`
  * \param 7 : (OUTPUT) function values at next grid point `x + h`
@@ -178,7 +180,7 @@ real_rungekutta2
 (
         double,
         double,
-        real_sys_der,
+        real_odesys_der,
         void *,
         RealWorkspaceRK,
         Rarray,

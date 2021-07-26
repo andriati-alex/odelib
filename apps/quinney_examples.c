@@ -46,7 +46,8 @@ rarr_copy_values(unsigned int array_size, Rarray from, Rarray to)
 
 
 /** \brief System derivatives with 4 equations */
-void sys_der(RealODEInputParameters inp_params, Rarray yprime)
+void
+sys_der(RealODEInputParameters inp_params, Rarray yprime)
 {
     struct sys_extra_param * p = (
             (struct sys_extra_param *) inp_params->extra_args
@@ -106,10 +107,10 @@ int main(int argc, char * argv[])
 
     /* workspace and arrays needed in integrators allocation */
     wsrk.system_size = 4;
-    alloc_real_rkwsarrays(&wsrk);
+    alloc_real_rungekutta_wsarrays(&wsrk);
     wsms.ms_order = 1;
     wsms.system_size = 4;
-    alloc_real_multistep_array(&wsms);
+    alloc_real_multistep_wsarray(&wsms);
     yrk2  = (double *) malloc(wsrk.system_size * sizeof(double));
     yrk4  = (double *) malloc(wsrk.system_size * sizeof(double));
     yms2  = (double *) malloc(wsms.system_size * sizeof(double));
@@ -142,7 +143,7 @@ int main(int argc, char * argv[])
         real_general_multistep(
                 h, i * h, &sys_der, &p, &wsms, yms2, a, b, 0, ynext
         );
-        real_set_next_step((i + 1) * h, &sys_der, &p, &wsms, yms2, ynext);
+        real_set_next_multistep((i + 1) * h, &sys_der, &p, &wsms, yms2, ynext);
         real_rungekutta2(h, i * h, &sys_der, &p, &wsrk, yrk2, ynext);
         printf(" ");
         for (int j = 0; j < wsrk.system_size; j++) printf(" %.5lf", yrk2[j]);
@@ -153,8 +154,8 @@ int main(int argc, char * argv[])
         rarr_copy_values(wsrk.system_size, ynext, yrk4);
     }
 
-    free_real_rkwsarrays(&wsrk);
-    free_real_multistep_array(&wsms);
+    free_real_rungekutta_wsarrays(&wsrk);
+    free_real_multistep_wsarray(&wsms);
     free(yrk2);
     free(yrk4);
     free(yms2);

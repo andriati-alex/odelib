@@ -80,7 +80,7 @@ int main(int argc, char * argv[])
     sys_params.extra_args = NULL;
     wsms.ms_order = 2;
     wsms.system_size = 1;
-    alloc_real_multistep_array(&wsms);
+    alloc_real_multistep_wsarray(&wsms);
 
     y0[0] = 1.0;
     y1[0] = 1.0 / (1 - h);  /* Exact solution instead of RK4 */
@@ -112,7 +112,7 @@ int main(int argc, char * argv[])
         printf("(corrector %2d)", i + 1);
     }
 
-    free_real_multistep_array(&wsms);
+    free_real_multistep_wsarray(&wsms);
 
     printf("\n\n");
     return 0;

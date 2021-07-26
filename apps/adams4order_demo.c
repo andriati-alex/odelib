@@ -37,7 +37,8 @@ rarr_copy_values(unsigned int array_size, Rarray from, Rarray to)
 
 
 /** \brief System derivatives with 4 equations */
-void sys_der(RealODEInputParameters inp_params, Rarray yprime)
+void
+sys_der(RealODEInputParameters inp_params, Rarray yprime)
 {
     double x = inp_params->x;
     Rarray y = inp_params->y;
@@ -94,10 +95,10 @@ int main(int argc, char * argv[])
     y0[0] = 1.0; y0[1] = 1.0; y0[2] = 1.0; y0[3] = 0.5;
 
     wsrk.system_size = 4;
-    alloc_real_rkwsarrays(&wsrk);
+    alloc_real_rungekutta_wsarrays(&wsrk);
     wsms.ms_order = 4;
     wsms.system_size = 4;
-    alloc_real_multistep_array(&wsms);
+    alloc_real_multistep_wsarray(&wsms);
     sys_params.system_size = 4;
     sys_params.extra_args = NULL;
 
@@ -122,7 +123,7 @@ int main(int argc, char * argv[])
     for (i = 3; i < nsteps; i++)
     {
         real_adams4pc(h, i * h, &sys_der, NULL, &wsms, yabm, niter, yabm_next);
-        real_set_next_step((i + 1) * h, &sys_der, NULL, &wsms, yabm, yabm_next);
+        real_set_next_multistep((i + 1) * h, &sys_der, NULL, &wsms, yabm, yabm_next);
         real_rungekutta4(h, i * h, &sys_der, NULL, &wsrk, y0, yrk4);
         rarr_copy_values(wsrk.system_size, yrk4, y0);
         printf("\n%6.3lf", (i + 1) * h);
@@ -132,8 +133,8 @@ int main(int argc, char * argv[])
             printf(" %17.14lf", yabm_next[j]);
     }
 
-    free_real_rkwsarrays(&wsrk);
-    free_real_multistep_array(&wsms);
+    free_real_rungekutta_wsarrays(&wsrk);
+    free_real_multistep_wsarray(&wsms);
 
     printf("\n\n");
     return 0;

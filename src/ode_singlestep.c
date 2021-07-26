@@ -20,7 +20,7 @@
 
 
 void
-alloc_cmplx_rkwsarrays(ComplexWorkspaceRK ws)
+alloc_cplx_rungekutta_wsarrays(ComplexWorkspaceRK ws)
 {
     ws->work1 = alloc_carr(ws->system_size);
     ws->work2 = alloc_carr(ws->system_size);
@@ -31,7 +31,7 @@ alloc_cmplx_rkwsarrays(ComplexWorkspaceRK ws)
 
 
 void
-alloc_real_rkwsarrays(RealWorkspaceRK ws)
+alloc_real_rungekutta_wsarrays(RealWorkspaceRK ws)
 {
     ws->work1 = alloc_rarr(ws->system_size);
     ws->work2 = alloc_rarr(ws->system_size);
@@ -42,7 +42,7 @@ alloc_real_rkwsarrays(RealWorkspaceRK ws)
 
 
 void
-free_cmplx_rkwsarrays(ComplexWorkspaceRK ws)
+free_cplx_rungekutta_wsarrays(ComplexWorkspaceRK ws)
 {
     free(ws->work1);
     free(ws->work2);
@@ -53,7 +53,7 @@ free_cmplx_rkwsarrays(ComplexWorkspaceRK ws)
 
 
 void
-free_real_rkwsarrays(RealWorkspaceRK ws)
+free_real_rungekutta_wsarrays(RealWorkspaceRK ws)
 {
     free(ws->work1);
     free(ws->work2);
@@ -64,7 +64,7 @@ free_real_rkwsarrays(RealWorkspaceRK ws)
 
 
 ComplexWorkspaceRK
-get_cmplx_rkws(int sys_size)
+get_cplx_rungekutta_ws(int sys_size)
 {
     ComplexWorkspaceRK
         ws = (ComplexWorkspaceRK) malloc(sizeof(_ComplexWorkspaceRK));
@@ -74,13 +74,13 @@ get_cmplx_rkws(int sys_size)
         exit(EXIT_FAILURE);
     }
     ws->system_size = sys_size;
-    alloc_cmplx_rkwsarrays(ws);
+    alloc_cplx_rungekutta_wsarrays(ws);
     return ws;
 }
 
 
 RealWorkspaceRK
-get_real_rkws(int sys_size)
+get_real_rungekutta_ws(int sys_size)
 {
     RealWorkspaceRK
         ws = (RealWorkspaceRK) malloc(sizeof(_RealWorkspaceRK));
@@ -90,32 +90,32 @@ get_real_rkws(int sys_size)
         exit(EXIT_FAILURE);
     }
     ws->system_size = sys_size;
-    alloc_real_rkwsarrays(ws);
+    alloc_real_rungekutta_wsarrays(ws);
     return ws;
 }
 
 
 void
-free_real_rkws(RealWorkspaceRK ws)
+destroy_real_rungekutta_ws(RealWorkspaceRK ws)
 {
-    free_real_rkwsarrays(ws);
+    free_real_rungekutta_wsarrays(ws);
     free(ws);
 }
 
 
 void
-free_cmplx_rkws(ComplexWorkspaceRK ws)
+destroy_cplx_rungekutta_ws(ComplexWorkspaceRK ws)
 {
-    free_cmplx_rkwsarrays(ws);
+    free_cplx_rungekutta_wsarrays(ws);
     free(ws);
 }
 
 
 void
-cmplx_rungekutta4(
+cplx_rungekutta4(
         double h,
         double x,
-        cmplx_sys_der yprime,
+        cplx_odesys_der yprime,
         void * args,
         ComplexWorkspaceRK ws,
         Carray y,
@@ -178,7 +178,7 @@ void
 real_rungekutta4(
         double h,
         double x,
-        real_sys_der yprime,
+        real_odesys_der yprime,
         void * args,
         RealWorkspaceRK ws,
         Rarray y,
@@ -238,10 +238,10 @@ real_rungekutta4(
 
 
 void
-cmplx_rungekutta2(
+cplx_rungekutta2(
         double h,
         double x,
-        cmplx_sys_der yprime,
+        cplx_odesys_der yprime,
         void * args,
         ComplexWorkspaceRK ws,
         Carray y,
@@ -288,7 +288,7 @@ void
 real_rungekutta2(
         double h,
         double x,
-        real_sys_der yprime,
+        real_odesys_der yprime,
         void * args,
         RealWorkspaceRK ws,
         Rarray y,

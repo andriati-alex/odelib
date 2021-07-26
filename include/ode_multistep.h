@@ -50,19 +50,19 @@ typedef _RealWorkspaceMS * RealWorkspaceMS;
 
 /** \brief Alloc struct internal array based on its integer fields */
 void
-alloc_cmplx_multistep_array(ComplexWorkspaceMS);
+alloc_cplx_multistep_wsarray(ComplexWorkspaceMS);
 
 /** \brief Alloc struct internal array based on its integer fields */
 void
-alloc_real_multistep_array(RealWorkspaceMS);
+alloc_real_multistep_wsarray(RealWorkspaceMS);
 
 /** \brief Free internal struct pointer */
 void
-free_cmplx_multistep_array(ComplexWorkspaceMS);
+free_cplx_multistep_wsarray(ComplexWorkspaceMS);
 
 /** \brief Free internal struct pointer */
 void
-free_real_multistep_array(RealWorkspaceMS);
+free_real_multistep_wsarray(RealWorkspaceMS);
 
 /** \brief Return fresh allocated struct address with internal fields set
  *
@@ -70,7 +70,7 @@ free_real_multistep_array(RealWorkspaceMS);
  * \param 2 : multistep order (number of previous steps required)
  */
 ComplexWorkspaceMS
-get_cmplx_multistep_ws(unsigned int, unsigned int);
+get_cplx_multistep_ws(unsigned int, unsigned int);
 
 /** \brief Return fresh allocated struct address with internal fields set
  *
@@ -83,18 +83,18 @@ get_real_multistep_ws(unsigned int, unsigned int);
 
 /** \brief Free allocated complex workspace struct and its internal pointer */
 void
-free_cmplx_multistep_ws(ComplexWorkspaceMS);
+destroy_cplx_multistep_ws(ComplexWorkspaceMS);
 
 
 /** \brief Free allcated real workspace struct and its internal pointer */
 void
-free_real_multistep_ws(RealWorkspaceMS);
+destroy_real_multistep_ws(RealWorkspaceMS);
 
 /** \brief Prepare derivatives and solution to propagate next step */
 void
-cmplx_set_next_step(
+cplx_set_next_multistep(
         double,
-        cmplx_sys_der,
+        cplx_odesys_der,
         void *,
         ComplexWorkspaceMS,
         Carray,
@@ -103,9 +103,9 @@ cmplx_set_next_step(
 
 /** \brief Prepare derivatives and solution to propagate next step */
 void
-real_set_next_step(
+real_set_next_multistep(
         double,
-        real_sys_der,
+        real_odesys_der,
         void *,
         RealWorkspaceMS,
         Rarray,
@@ -125,7 +125,7 @@ real_set_next_step(
  * \param 1 : grid spacing `h`
  * \param 2 : grid point correspongind to function values `x`
  * \param 3 : function pointer to routine that compute derivatives
- * \param 4 : extra arguments required in `cmplx_sys_der` function
+ * \param 4 : extra arguments required in `cplx_odesys_der` function
  * \param 5 : Workspace struct address to avoid memory allocation.
  *            The array within this struct must have at least size
  *            `m * n` if the method is explicit, and `(m + 1) * n`
@@ -149,11 +149,11 @@ real_set_next_step(
  *            (INPUT)  use as predictor if parameter 9 is greater than 0
  */
 void
-cmplx_general_multistep
+cplx_general_multistep
 (
         double,
         double,
-        cmplx_sys_der,
+        cplx_odesys_der,
         void *,
         ComplexWorkspaceMS,
         Carray,
@@ -176,7 +176,7 @@ cmplx_general_multistep
  * \param 1 : grid spacing `h`
  * \param 2 : grid point correspongind to function values `x`
  * \param 3 : function pointer to routine that compute derivatives
- * \param 4 : extra arguments required in `cmplx_sys_der` function
+ * \param 4 : extra arguments required in `cplx_odesys_der` function
  * \param 5 : Workspace struct address to avoid memory allocation.
  *            The array within this struct must have at least size
  *            `m * n` if the method is explicit, and `(m + 1) * n`
@@ -204,7 +204,7 @@ real_general_multistep
 (
         double,
         double,
-        real_sys_der,
+        real_odesys_der,
         void *,
         RealWorkspaceMS,
         Rarray,
@@ -224,7 +224,7 @@ real_general_multistep
  * \param 1 : grid spacing `h`
  * \param 2 : grid point correspongind to function values `x`
  * \param 3 : function pointer to routine that compute derivatives
- * \param 4 : extra arguments required in `cmplx_sys_der` function
+ * \param 4 : extra arguments required in `cplx_odesys_der` function
  * \param 5 : Workspace struct address to avoid memory allocation.
  *            The array within this struct must have at least size
  *            `(m + 1) * n` due to implicit computation, must have
@@ -239,7 +239,7 @@ void
 real_adams4pc(
         double,
         double,
-        real_sys_der,
+        real_odesys_der,
         void *,
         RealWorkspaceMS,
         Rarray,
@@ -257,7 +257,7 @@ real_adams4pc(
  * \param 1 : grid spacing `h`
  * \param 2 : grid point correspongind to function values `x`
  * \param 3 : function pointer to routine that compute derivatives
- * \param 4 : extra arguments required in `cmplx_sys_der` function
+ * \param 4 : extra arguments required in `cplx_odesys_der` function
  * \param 5 : Workspace struct address to avoid memory allocation.
  *            The array within this struct must have at least size
  *            `(m + 1) * n` due to implicit computation, must have
@@ -269,10 +269,10 @@ real_adams4pc(
  * \param 8: (OUTPUT) solution at next grid step
  */
 void
-cmplx_adams4pc(
+cplx_adams4pc(
         double,
         double,
-        cmplx_sys_der,
+        cplx_odesys_der,
         void *,
         ComplexWorkspaceMS,
         Carray,
