@@ -16,7 +16,7 @@
  */
 
 #include "ode_singlestep.h"
-#include <stdlib.h>
+#include "arrays_assistant.h"
 
 
 void

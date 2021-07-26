@@ -1,7 +1,7 @@
 /**
  * \file ode_multistep.h
  * \author Alex Andriati
- * \brief ODE integration routines with multi step methods
+ * \brief ODE integration routines with multistep methods
  *
  * These numerical routines require mutiple known steps simultaneously
  * to compute a new one. Generally these methods depend on single step

@@ -28,6 +28,14 @@
 #include "ode_multistep.h"
 
 
+/** \brief Copy values from the first array to the second */
+void
+rarr_copy_values(unsigned int array_size, Rarray from, Rarray to)
+{
+    for (unsigned int i = 0; i < array_size; i++) to[i] = from[i];
+}
+
+
 /** \brief System derivatives with 4 equations */
 void sys_der(RealODEInputParameters inp_params, Rarray yprime)
 {

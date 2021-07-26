@@ -3,14 +3,14 @@
  * \author Alex Andriati
  * \brief ODE integration routines with explicit single step methods
  *
- * Numerical integration methods of ODE systems that require only two
- * adjacent steps are named single step methods. Moreover, a subclass
- * of these methods are the explicit single step methods, a.k.a Runge-
- * Kutta methods, which are treated in this file
+ * Numerical integration methods of ODE systems that require only one
+ * previous adjacent step are named single step methods. Moreover, a
+ * subclass of these methods are the explicit single step methods, a.k.a
+ * Runge-Kutta methods, which are treated in this file
  */
 
-#ifndef ODE_EXPLICIT_SINGLESTEP_H
-#define ODE_EXPLICIT_SINGLESTEP_H
+#ifndef ODE_SINGLESTEP_H
+#define ODE_SINGLESTEP_H
 
 #include "derivative_signature.h"
 

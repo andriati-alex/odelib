@@ -1,5 +1,5 @@
 #include "ode_multistep.h"
-#include <stdio.h>
+#include "arrays_assistant.h"
 
 
 void
@@ -123,10 +123,7 @@ cmplx_set_next_step(
             der[i + j * s] = der[i + (j - 1) * s];
         }
     }
-    for (i = 0; i < s; i++)
-    {
-        y[i] = ynext[i];
-    }
+    carr_copy_values(s, ynext, y);
     yprime(&sys_params, der);
 }
 
@@ -168,10 +165,7 @@ real_set_next_step(
             der[i + j * s] = der[i + (j - 1) * s];
         }
     }
-    for (i = 0; i < s; i++)
-    {
-        y[i] = ynext[i];
-    }
+    rarr_copy_values(s, ynext, y);
     yprime(&sys_params, der);
 }
 

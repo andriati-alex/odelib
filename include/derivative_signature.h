@@ -9,19 +9,19 @@
  * can be made linear in function derivatives, where derivatives can
  * be written as y' = f(x, y) with y a vector of functions values at
  * grid point x. These signatures standardize user input function as
- * well provide general parameters struct for extra parameters
+ * well provide general input struct for extra parameters
  */
 
 #ifndef DERIVATIVE_SIGNATURE_H
 #define DERIVATIVE_SIGNATURE_H
 
-#include "vector.h"
+#include "arrays.h"
 
 /** \brief Struct with input parameters for derivatives computation */
 typedef struct{
     unsigned int system_size;   /// number of equations in the system
     double x;                   /// grid point of the known solution
-    Rarray y;
+    Rarray y;                   /// function values at `x`
     void * extra_args;          /// user-defined external arguments
 } _RealODEInputParameters;
 
@@ -32,7 +32,7 @@ typedef _RealODEInputParameters * RealODEInputParameters;
 typedef struct{
     unsigned int system_size;   /// number of equations in the system
     double x;                   /// grid point of the known solution
-    Carray y;
+    Carray y;                   /// function values at `x`
     void * extra_args;          /// user-defined external arguments
 } _ComplexODEInputParameters;
 

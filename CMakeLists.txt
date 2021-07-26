@@ -12,7 +12,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-add_library(odelib SHARED src/ode_multistep.c src/ode_singlestep.c src/vector.c)
+add_library(odelib SHARED src/ode_multistep.c src/ode_singlestep.c)
 target_include_directories(odelib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 
