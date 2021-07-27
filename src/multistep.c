@@ -200,6 +200,7 @@ cplx_set_next_multistep(
     sys_params.system_size = s;
     sys_params.extra_args = args;
 
+    /* shift chunks representing concatenated previous steps */
     for (j = m - 1; j > 0; j--)
     {
         for (i = 0; i < s; i++)
@@ -242,6 +243,7 @@ real_set_next_multistep(
     sys_params.system_size = s;
     sys_params.extra_args = args;
 
+    /* shift chunks representing concatenated previous steps */
     for (j = m - 1; j > 0; j--)
     {
         for (i = 0; i < s; i++)

@@ -66,8 +66,6 @@ int main(int argc, char * argv[])
         wsrk;
     _RealWorkspaceMS
         wsms;
-    _RealODEInputParameters
-        sys_params;
 
     if (argc > 3)
     {
@@ -99,8 +97,6 @@ int main(int argc, char * argv[])
     wsms.ms_order = 4;
     wsms.system_size = 4;
     alloc_real_multistep_wsarray(&wsms);
-    sys_params.system_size = 4;
-    sys_params.extra_args = NULL;
 
     init_real_multistep(h, &sys_der, NULL, &wsms, y0, yabm);
 
