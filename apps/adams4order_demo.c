@@ -102,24 +102,22 @@ int main(int argc, char * argv[])
     sys_params.system_size = 4;
     sys_params.extra_args = NULL;
 
-    rarr_copy_values(wsrk.system_size, y0, yrk4);
-    for (i = 0; i < wsms.ms_order; i++)
+    init_real_multistep(h, &sys_der, NULL, &wsms, y0, yabm);
+
+    /* print initial condition */
+    printf("\n%6.3lf", 0.0);
+    for (j = 0; j < wsrk.system_size; j++) printf(" %11.8lf", y0[j]);
+
+    /* print first few rungekutta common steps */
+    for (i = 0; i < wsms.ms_order - 1; i++)
     {
-        rarr_copy_values(wsrk.system_size, yrk4, y0);
-        sys_params.x = i * h;
-        sys_params.y = yrk4;
-        j = (wsms.ms_order - 1 - i) * wsms.system_size;
-        sys_der(&sys_params, &wsms.prev_der[j]);
-        rarr_copy_values(wsms.system_size, yrk4, &yabm[j]);
-        printf("\n%6.3lf", i * h);
-        for (j = 0; j < wsrk.system_size; j++) printf(" %11.8lf", yrk4[j]);
-        for (j = 0; j < wsms.system_size; j++) printf(" %17.14lf", yrk4[j]);
         real_rungekutta4(h, i * h, &sys_der, NULL, &wsrk, y0, yrk4);
+        rarr_copy_values(wsrk.system_size, yrk4, y0);
+        printf("\n%6.3lf", (i + 1) * h);
+        for (j = 0; j < wsrk.system_size; j++) printf(" %11.8lf", y0[j]);
     }
 
-    /* recede the extra step unduly advanced in rk4 */
-    rarr_copy_values(wsrk.system_size, y0, yrk4);
-
+    /* from this point multistep 4th order adams(PC) is also available */
     for (i = 3; i < nsteps; i++)
     {
         real_adams4pc(h, i * h, &sys_der, NULL, &wsms, yabm, niter, yabm_next);

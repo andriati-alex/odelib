@@ -64,6 +64,32 @@ free_cplx_multistep_wsarray(ComplexWorkspaceMS);
 void
 free_real_multistep_wsarray(RealWorkspaceMS);
 
+/** \brief Set initial steps of multistep scheme using 4th order RungeKutta
+ *
+ * \param 1 : grid step size
+ * \param 2 : routine to compute ODE system derivative
+ * \param 3 : optional arguments required to compute system derivative
+ * \param 4 : (MODIFIED) workspace struct pointer with multistep setup
+ *            The `prev_der` field is set with initial derivatives needed
+ * \param 5 : array with initial condition
+ * \param 6 : (OUTPUT) concatenated previous steps required
+ */
+void
+init_real_multistep(double, real_odesys_der, void *, RealWorkspaceMS, Rarray, Rarray);
+
+/** \brief Set initial steps of multistep scheme using 4th order RungeKutta
+ *
+ * \param 1 : grid step size
+ * \param 2 : routine to compute ODE system derivative
+ * \param 3 : optional arguments required to compute system derivative
+ * \param 4 : (MODIFIED) workspace struct pointer with multistep setup
+ *            The `prev_der` field is set with initial derivatives needed
+ * \param 5 : array with initial condition
+ * \param 6 : (OUTPUT) concatenated previous steps required
+ */
+void
+init_cplx_multistep(double, cplx_odesys_der, void *, ComplexWorkspaceMS, Carray, Carray);
+
 /** \brief Return fresh allocated struct address with internal fields set
  *
  * \param 1 : system size

@@ -1,4 +1,5 @@
 #include "ode_multistep.h"
+#include "ode_singlestep.h"
 #include "arrays_assistant.h"
 
 
@@ -31,6 +32,90 @@ void
 free_real_multistep_wsarray(RealWorkspaceMS ws)
 {
     free(ws->prev_der);
+}
+
+
+void
+init_real_multistep(double h, real_odesys_der yprime, void * args, RealWorkspaceMS ws, Rarray y0, Rarray yms_init)
+{
+    int
+        i,
+        j,
+        sys_size;
+    Rarray
+        ywork;
+    RealWorkspaceRK
+        wsrk;
+    _RealODEInputParameters
+        inp;
+
+    sys_size = ws->system_size;
+    ywork = alloc_rarr(sys_size);
+    wsrk = get_real_rungekutta_ws(sys_size);
+    rarr_copy_values(sys_size, y0, ywork);
+
+    inp.x = 0;
+    inp.y = ywork;
+    inp.extra_args = args;
+    inp.system_size = sys_size;
+
+    j = (ws->ms_order - 1) * sys_size;
+    rarr_copy_values(sys_size, ywork, &yms_init[j]);
+    yprime(&inp, &ws->prev_der[j]);
+
+    for (i = 1; i < ws->ms_order; i++)
+    {
+        j = (ws->ms_order - 1 - i) * sys_size;
+        real_rungekutta4(h, inp.x, yprime, args, wsrk, ywork, &yms_init[j]);
+        rarr_copy_values(sys_size, &yms_init[j], ywork);
+        inp.x = i * h;
+        yprime(&inp, &ws->prev_der[j]);
+    }
+
+    free(ywork);
+    destroy_real_rungekutta_ws(wsrk);
+}
+
+
+void
+init_cplx_multistep(double h, cplx_odesys_der yprime, void * args, ComplexWorkspaceMS ws, Carray y0, Carray yms_init)
+{
+    int
+        i,
+        j,
+        sys_size;
+    Carray
+        ywork;
+    ComplexWorkspaceRK
+        wsrk;
+    _ComplexODEInputParameters
+        inp;
+
+    sys_size = ws->system_size;
+    ywork = alloc_carr(sys_size);
+    wsrk = get_cplx_rungekutta_ws(sys_size);
+    carr_copy_values(sys_size, y0, ywork);
+
+    inp.x = 0;
+    inp.y = ywork;
+    inp.extra_args = args;
+    inp.system_size = sys_size;
+
+    j = (ws->ms_order - 1) * sys_size;
+    carr_copy_values(sys_size, ywork, &yms_init[j]);
+    yprime(&inp, &ws->prev_der[j]);
+
+    for (i = 1; i < ws->ms_order; i++)
+    {
+        j = (ws->ms_order - 1 - i) * sys_size;
+        cplx_rungekutta4(h, inp.x, yprime, args, wsrk, ywork, &yms_init[j]);
+        carr_copy_values(sys_size, &yms_init[j], ywork);
+        inp.x = i * h;
+        yprime(&inp, &ws->prev_der[j]);
+    }
+
+    free(ywork);
+    destroy_cplx_rungekutta_ws(wsrk);
 }
 
 
