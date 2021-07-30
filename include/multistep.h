@@ -1,5 +1,5 @@
 /**
- * \file ode_multistep.h
+ * \file multistep.h
  * \author Alex Andriati
  * \brief ODE integration routines with multistep methods
  *
@@ -12,6 +12,7 @@
 #define ODE_MULTISTEP_H
 
 #include "derivative_signature.h"
+#include "singlestep.h"
 
 /** \brief Struct to provide complex workspace for multistep methods
  *
@@ -64,7 +65,7 @@ free_cplx_multistep_wsarray(ComplexWorkspaceMS);
 void
 free_real_multistep_wsarray(RealWorkspaceMS);
 
-/** \brief Set initial steps of multistep scheme using 4th order RungeKutta
+/** \brief Set initial steps of multistep scheme using given RK method
  *
  * \param 1 : grid step size
  * \param 2 : routine to compute ODE system derivative
@@ -72,12 +73,21 @@ free_real_multistep_wsarray(RealWorkspaceMS);
  * \param 4 : (MODIFIED) workspace struct pointer with multistep setup
  *            The `prev_der` field is set with initial derivatives needed
  * \param 5 : array with initial condition
- * \param 6 : (OUTPUT) concatenated previous steps required
+ * \param 6 : address of RungeKutta routine to use
+ * \param 7 : (OUTPUT) concatenated initial steps required
  */
 void
-init_real_multistep(double, real_odesys_der, void *, RealWorkspaceMS, Rarray, Rarray);
+init_real_multistep(
+        double,
+        real_odesys_der,
+        void *,
+        RealWorkspaceMS,
+        Rarray,
+        real_rk_routine,
+        Rarray
+);
 
-/** \brief Set initial steps of multistep scheme using 4th order RungeKutta
+/** \brief Set initial steps of multistep scheme using given RK method
  *
  * \param 1 : grid step size
  * \param 2 : routine to compute ODE system derivative
@@ -85,10 +95,19 @@ init_real_multistep(double, real_odesys_der, void *, RealWorkspaceMS, Rarray, Ra
  * \param 4 : (MODIFIED) workspace struct pointer with multistep setup
  *            The `prev_der` field is set with initial derivatives needed
  * \param 5 : array with initial condition
- * \param 6 : (OUTPUT) concatenated previous steps required
+ * \param 6 : address of RungeKutta routine to use
+ * \param 7 : (OUTPUT) concatenated initial steps required
  */
 void
-init_cplx_multistep(double, cplx_odesys_der, void *, ComplexWorkspaceMS, Carray, Carray);
+init_cplx_multistep(
+        double,
+        cplx_odesys_der,
+        void *,
+        ComplexWorkspaceMS,
+        Carray,
+        cplx_rk_routine,
+        Carray
+);
 
 /** \brief Return fresh allocated struct address with internal fields set
  *
@@ -334,6 +353,32 @@ real_adams4pc(
  */
 void
 cplx_adams4pc(
+        double,
+        double,
+        cplx_odesys_der,
+        void *,
+        ComplexWorkspaceMS,
+        Carray,
+        unsigned int,
+        Carray
+);
+
+
+void
+real_adams6pc(
+        double,
+        double,
+        real_odesys_der,
+        void *,
+        RealWorkspaceMS,
+        Rarray,
+        unsigned int,
+        Rarray
+);
+
+
+void
+cplx_adams6pc(
         double,
         double,
         cplx_odesys_der,

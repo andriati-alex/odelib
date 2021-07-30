@@ -24,8 +24,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "ode_singlestep.h"
-#include "ode_multistep.h"
+#include "singlestep.h"
+#include "multistep.h"
 
 
 /** \brief Extra parameters for derivatives computation */

@@ -1,5 +1,5 @@
 /**
- * \file ode_singlestep.h
+ * \file singlestep.h
  * \author Alex Andriati
  * \brief ODE integration routines with explicit single step methods
  *
@@ -27,7 +27,9 @@ typedef struct{
         work2,
         work3,
         work4,
-        work5;
+        work5,
+        work6,
+        work7;
 } _ComplexWorkspaceRK;
 
 /** \brief Struct workspace address for single step methods */
@@ -45,11 +47,33 @@ typedef struct{
         work2,
         work3,
         work4,
-        work5;
+        work5,
+        work6,
+        work7;
 } _RealWorkspaceRK;
 
 /** \brief Struct workspace address for single step methods */
 typedef _RealWorkspaceRK * RealWorkspaceRK;
+
+typedef void (*real_rk_routine)(
+        double,
+        double,
+        real_odesys_der,
+        void *,
+        RealWorkspaceRK,
+        Rarray,
+        Rarray
+);
+
+typedef void (*cplx_rk_routine)(
+        double,
+        double,
+        cplx_odesys_der,
+        void *,
+        ComplexWorkspaceRK,
+        Carray,
+        Carray
+);
 
 
 /** \brief Alloc internal arrays in struct address given */
@@ -90,6 +114,52 @@ destroy_real_rungekutta_ws(RealWorkspaceRK);
 /** \brief Free allocated workspace struct and its internal arrays */
 void
 destroy_cplx_rungekutta_ws(ComplexWorkspaceRK);
+
+
+/**
+ * \brief 5th order Runge-Kutta method step integration
+ *
+ * \param 1 : grid spacing `h`
+ * \param 2 : current grid point `x`
+ * \param 3 : function pointing to routine that compute derivatives
+ * \param 4 : extra arguments (void pointer in _ComplexWorkspaceRK)
+ * \param 5 : Workspace struct address for internal derivative computation
+ * \param 6 : function values `y` computed at current grid point
+ * \param 7 : (OUTPUT) function values at next grid point `x + h`
+ */
+void
+cplx_rungekutta5(
+        double,
+        double,
+        cplx_odesys_der,
+        void *,
+        ComplexWorkspaceRK,
+        Carray,
+        Carray
+);
+
+
+/**
+ * \brief 5th order Runge-Kutta method step integration
+ *
+ * \param 1 : grid spacing `h`
+ * \param 2 : current grid point `x`
+ * \param 3 : function pointing to routine that compute derivatives
+ * \param 4 : extra arguments (void pointer in _ComplexWorkspaceRK)
+ * \param 5 : Workspace struct address for internal derivative computation
+ * \param 6 : function values `y` computed at current grid point
+ * \param 7 : (OUTPUT) function values at next grid point `x + h`
+ */
+void
+real_rungekutta5(
+        double,
+        double,
+        real_odesys_der,
+        void *,
+        RealWorkspaceRK,
+        Rarray,
+        Rarray
+);
 
 
 /**

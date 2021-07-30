@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "ode_multistep.h"
+#include "multistep.h"
 
 
 /** \brief System derivatives with 1 equation */

@@ -1,5 +1,27 @@
-#include "ode_multistep.h"
-#include "ode_singlestep.h"
+/**
+ * \file multistep.c
+ * \author Alex Andriati
+ * \brief Source code for multistep methods
+ *
+ * See function signature and description in header multistep.h
+ * Multistep methods have a common general form, using some coefficients
+ * to combine previous steps and their derivatives. Therefore, there are
+ * general routines for real and complex systems which consume as input
+ * these coefficients, as well directed routines for specific approaches
+ * which have specific coefficients. Among these routines with ready to
+ * use coefficients are the Adams predictor-corrector of order 4 and 6.
+ *
+ * [1] Douglas Quinney, An introduction to the numerical solution of
+ * differential equations, Revised Edition, 1987, cap. 2
+ * [2] J.C. Butcher, Numerical methods for ordinary differential equations,
+ * Wiley, 3rd Edition
+ * [3] William H. Press et. al., Numerical Recipes in C, 2nd Edition
+ * cap. 16
+ * [4] Arieh Iserles, A first course in the numerical analysis of
+ * differential equations, Cambridge, 2nd Edition, cap. 3
+ */
+
+#include "multistep.h"
 #include "arrays_assistant.h"
 
 
@@ -36,7 +58,15 @@ free_real_multistep_wsarray(RealWorkspaceMS ws)
 
 
 void
-init_real_multistep(double h, real_odesys_der yprime, void * args, RealWorkspaceMS ws, Rarray y0, Rarray yms_init)
+init_real_multistep(
+        double h,
+        real_odesys_der yprime,
+        void * args,
+        RealWorkspaceMS ws,
+        Rarray y0,
+        real_rk_routine rk,
+        Rarray yms_init
+)
 {
     int
         i,
@@ -66,7 +96,7 @@ init_real_multistep(double h, real_odesys_der yprime, void * args, RealWorkspace
     for (i = 1; i < ws->ms_order; i++)
     {
         j = (ws->ms_order - 1 - i) * sys_size;
-        real_rungekutta4(h, inp.x, yprime, args, wsrk, ywork, &yms_init[j]);
+        (*rk)(h, inp.x, yprime, args, wsrk, ywork, &yms_init[j]);
         rarr_copy_values(sys_size, &yms_init[j], ywork);
         inp.x = i * h;
         yprime(&inp, &ws->prev_der[j]);
@@ -78,7 +108,15 @@ init_real_multistep(double h, real_odesys_der yprime, void * args, RealWorkspace
 
 
 void
-init_cplx_multistep(double h, cplx_odesys_der yprime, void * args, ComplexWorkspaceMS ws, Carray y0, Carray yms_init)
+init_cplx_multistep(
+        double h,
+        cplx_odesys_der yprime,
+        void * args,
+        ComplexWorkspaceMS ws,
+        Carray y0,
+        cplx_rk_routine rk,
+        Carray yms_init
+)
 {
     int
         i,
@@ -108,7 +146,7 @@ init_cplx_multistep(double h, cplx_odesys_der yprime, void * args, ComplexWorksp
     for (i = 1; i < ws->ms_order; i++)
     {
         j = (ws->ms_order - 1 - i) * sys_size;
-        cplx_rungekutta4(h, inp.x, yprime, args, wsrk, ywork, &yms_init[j]);
+        (*rk)(h, inp.x, yprime, args, wsrk, ywork, &yms_init[j]);
         carr_copy_values(sys_size, &yms_init[j], ywork);
         inp.x = i * h;
         yprime(&inp, &ws->prev_der[j]);
@@ -450,4 +488,60 @@ cplx_adams4pc(
     cplx_general_multistep(h, x, yprime, args, ws, y, ap, bp, 0, ynext);
     if (iter == 0) return;
     cplx_general_multistep(h, x, yprime, args, ws, y, ac, bc, iter, ynext);
+}
+
+
+void
+cplx_adams6pc(
+        double h,
+        double x,
+        cplx_odesys_der yprime,
+        void * args,
+        ComplexWorkspaceMS ws,
+        Carray y,
+        unsigned int iter,
+        Carray ynext
+)
+{
+    double
+        ap[7] = {   1.0,   -1.0,     0.0,    0.0,     0.0,    0.0,    0.0},
+        bp[7] = {   0.0, 4277.0, -7923.0, 9982.0, -7298.0, 2877.0, -475.0},
+        ac[7] = {   1.0,   -1.0,     0.0,    0.0,     0.0,    0.0,    0.0},
+        bc[7] = { 475.0, 1427.0,  -798.0,  482.0,  -173.0,   27.0,    0.0};
+    for (int i = 0; i < 7; i++)
+    {
+        bp[i] = bp[i] / 1440.0;
+        bc[i] = bc[i] / 1440.0;
+    }
+    cplx_general_multistep(h, x, yprime, args, ws, y, ap, bp, 0, ynext);
+    if (iter == 0) return;
+    cplx_general_multistep(h, x, yprime, args, ws, y, ac, bc, iter, ynext);
+}
+
+
+void
+real_adams6pc(
+        double h,
+        double x,
+        real_odesys_der yprime,
+        void * args,
+        RealWorkspaceMS ws,
+        Rarray y,
+        unsigned int iter,
+        Rarray ynext
+)
+{
+    double
+        ap[7] = {   1.0,   -1.0,     0.0,    0.0,     0.0,    0.0,    0.0},
+        bp[7] = {   0.0, 4277.0, -7923.0, 9982.0, -7298.0, 2877.0, -475.0},
+        ac[7] = {   1.0,   -1.0,     0.0,    0.0,     0.0,    0.0,    0.0},
+        bc[7] = { 475.0, 1427.0,  -798.0,  482.0,  -173.0,   27.0,    0.0};
+    for (int i = 0; i < 7; i++)
+    {
+        bp[i] = bp[i] / 1440.0;
+        bc[i] = bc[i] / 1440.0;
+    }
+    real_general_multistep(h, x, yprime, args, ws, y, ap, bp, 0, ynext);
+    if (iter == 0) return;
+    real_general_multistep(h, x, yprime, args, ws, y, ac, bc, iter, ynext);
 }

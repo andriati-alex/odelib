@@ -30,8 +30,14 @@ add_executable(adams4order_demo apps/adams4order_demo.c)
 target_link_libraries(adams4order_demo PUBLIC ode)
 set_target_properties(adams4order_demo PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
 
+add_executable(methods_comparison apps/methods_comparison.c)
+target_link_libraries(methods_comparison PUBLIC m)
+target_link_libraries(methods_comparison PUBLIC ode)
+set_target_properties(methods_comparison PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+
 
 install(TARGETS ode DESTINATION lib)
 install(TARGETS quinney_examples DESTINATION bin)
 install(TARGETS quinney_corrector_iteration DESTINATION bin)
 install(TARGETS adams4order_demo DESTINATION bin)
+install(TARGETS methods_comparison DESTINATION bin)
