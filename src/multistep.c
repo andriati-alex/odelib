@@ -25,6 +25,17 @@
 #include "arrays_assistant.h"
 
 
+static double
+    ADAMS4_LEFT[5] = {1.0, -1.0, 0.0, 0.0, 0.0},
+    ADAMS4_PRED[5] = {0.0, 55.0 / 24, -59.0 / 24, 37.0 / 24, -9.0 / 24},
+    ADAMS4_CORR[5] = {9.0 / 24, 19.0 / 24, -5.0 / 24, 1.0 / 24, 0.0};
+
+static double
+    ADAMS6_LEFT[7] = {1.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+    ADAMS6_PRED[7] = {0.0, 4277.0 / 1440, -7923.0 / 1440, 9982.0 / 1440, -7298.0 / 1440, 2877.0 / 1440, -475.0 / 1440},
+    ADAMS6_CORR[7] = {475.0 / 1440, 1427.0 / 1440, -798.0 / 1440, 482.0 / 1440, -173.0 / 1440, 27.0 / 1440, 0.0};
+
+
 void
 alloc_cplx_multistep_wsarray(ComplexWorkspaceMS ws)
 {
@@ -447,19 +458,13 @@ real_adams4pc(
         Rarray ynext
 )
 {
-    double
-        ap[5] = {1.0, -1.0,   0.0,  0.0,  0.0},
-        bp[5] = {0.0, 55.0, -59.0, 37.0, -9.0},
-        ac[5] = {1.0, -1.0,   0.0,  0.0,  0.0},
-        bc[5] = {9.0, 19.0,  -5.0,  1.0,  0.0};
-    for (int i = 0; i < 5; i++)
-    {
-        bp[i] = bp[i] / 24;
-        bc[i] = bc[i] / 24;
-    }
-    real_general_multistep(h, x, yprime, args, ws, y, ap, bp, 0, ynext);
+    real_general_multistep(
+            h, x, yprime, args, ws, y, ADAMS4_LEFT, ADAMS4_PRED, 0, ynext
+    );
     if (iter == 0) return;
-    real_general_multistep(h, x, yprime, args, ws, y, ac, bc, iter, ynext);
+    real_general_multistep(
+            h, x, yprime, args, ws, y, ADAMS4_LEFT, ADAMS4_CORR, iter, ynext
+    );
 }
 
 
@@ -475,19 +480,13 @@ cplx_adams4pc(
         Carray ynext
 )
 {
-    double
-        ap[5] = {1.0, -1.0,   0.0,  0.0,  0.0},
-        bp[5] = {0.0, 55.0, -59.0, 37.0, -9.0},
-        ac[5] = {1.0, -1.0,   0.0,  0.0,  0.0},
-        bc[5] = {9.0, 19.0,  -5.0,  1.0,  0.0};
-    for (int i = 0; i < 5; i++)
-    {
-        bp[i] = bp[i] / 24;
-        bc[i] = bc[i] / 24;
-    }
-    cplx_general_multistep(h, x, yprime, args, ws, y, ap, bp, 0, ynext);
+    cplx_general_multistep(
+            h, x, yprime, args, ws, y, ADAMS4_LEFT, ADAMS4_PRED, 0, ynext
+    );
     if (iter == 0) return;
-    cplx_general_multistep(h, x, yprime, args, ws, y, ac, bc, iter, ynext);
+    cplx_general_multistep(
+            h, x, yprime, args, ws, y, ADAMS4_LEFT, ADAMS4_CORR, iter, ynext
+    );
 }
 
 
@@ -503,19 +502,13 @@ cplx_adams6pc(
         Carray ynext
 )
 {
-    double
-        ap[7] = {   1.0,   -1.0,     0.0,    0.0,     0.0,    0.0,    0.0},
-        bp[7] = {   0.0, 4277.0, -7923.0, 9982.0, -7298.0, 2877.0, -475.0},
-        ac[7] = {   1.0,   -1.0,     0.0,    0.0,     0.0,    0.0,    0.0},
-        bc[7] = { 475.0, 1427.0,  -798.0,  482.0,  -173.0,   27.0,    0.0};
-    for (int i = 0; i < 7; i++)
-    {
-        bp[i] = bp[i] / 1440.0;
-        bc[i] = bc[i] / 1440.0;
-    }
-    cplx_general_multistep(h, x, yprime, args, ws, y, ap, bp, 0, ynext);
+    cplx_general_multistep(
+            h, x, yprime, args, ws, y, ADAMS6_LEFT, ADAMS6_PRED, 0, ynext
+    );
     if (iter == 0) return;
-    cplx_general_multistep(h, x, yprime, args, ws, y, ac, bc, iter, ynext);
+    cplx_general_multistep(
+            h, x, yprime, args, ws, y, ADAMS6_LEFT, ADAMS6_CORR, iter, ynext
+    );
 }
 
 
@@ -531,17 +524,11 @@ real_adams6pc(
         Rarray ynext
 )
 {
-    double
-        ap[7] = {   1.0,   -1.0,     0.0,    0.0,     0.0,    0.0,    0.0},
-        bp[7] = {   0.0, 4277.0, -7923.0, 9982.0, -7298.0, 2877.0, -475.0},
-        ac[7] = {   1.0,   -1.0,     0.0,    0.0,     0.0,    0.0,    0.0},
-        bc[7] = { 475.0, 1427.0,  -798.0,  482.0,  -173.0,   27.0,    0.0};
-    for (int i = 0; i < 7; i++)
-    {
-        bp[i] = bp[i] / 1440.0;
-        bc[i] = bc[i] / 1440.0;
-    }
-    real_general_multistep(h, x, yprime, args, ws, y, ap, bp, 0, ynext);
+    real_general_multistep(
+            h, x, yprime, args, ws, y, ADAMS6_LEFT, ADAMS6_PRED, 0, ynext
+    );
     if (iter == 0) return;
-    real_general_multistep(h, x, yprime, args, ws, y, ac, bc, iter, ynext);
+    real_general_multistep(
+            h, x, yprime, args, ws, y, ADAMS6_LEFT, ADAMS6_CORR, iter, ynext
+    );
 }
